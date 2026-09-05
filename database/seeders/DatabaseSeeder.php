@@ -15,10 +15,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Default admin for the Filament panel (/admin).
+        // CHANGE THIS PASSWORD before going to production.
+        User::updateOrCreate(
+            ['email' => 'admin@daretogobare.test'],
+            [
+                'name' => 'D2GB Admin',
+                'password' => bcrypt('password'),
+                'is_admin' => true,
+            ],
+        );
 
         $this->call([
             CatalogSeeder::class,
