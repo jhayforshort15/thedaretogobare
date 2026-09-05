@@ -11,7 +11,10 @@ void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
+            // Public storefront pages render full-width with their own header/footer.
             case name === 'Welcome':
+            case name === 'Home':
+            case name.startsWith('shop/'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
