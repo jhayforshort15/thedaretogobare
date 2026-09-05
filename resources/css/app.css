@@ -9,9 +9,19 @@
 
 @theme inline {
     --font-sans:
-        Instrument Sans, ui-sans-serif, system-ui, sans-serif,
+        Inter, Instrument Sans, ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
+
+    /* D2GB brand display/heading fonts */
+    --font-display: Anton, 'Oswald', 'Arial Narrow', sans-serif;
+    --font-heading: Oswald, 'Arial Narrow', sans-serif;
+
+    /* D2GB brand palette */
+    --color-d2gb-gold: #c8a464;
+    --color-d2gb-gold-light: #d9bd86;
+    --color-d2gb-dark: #0e0e0e;
+    --color-d2gb-charcoal: #1a1a1a;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
