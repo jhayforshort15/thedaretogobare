@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -9,22 +12,29 @@ class HomeController extends Controller
 {
     public function index(): Response
     {
-        // NOTE: Placeholder data. Once the e-commerce models exist,
-        // swap these arrays for Eloquent queries (Product, Category, etc.).
         return Inertia::render('Home', [
-            'categories' => [
-                ['name' => 'Men', 'slug' => 'men'],
-                ['name' => 'Women', 'slug' => 'women'],
-                ['name' => 'Unisex', 'slug' => 'unisex'],
-                ['name' => 'Fight Gear', 'slug' => 'fight-gear'],
-            ],
-            'bestSellers' => [
-                ['name' => 'D2GB Bad Intentions Tee', 'price' => 34.99, 'slug' => 'bad-intentions-tee'],
-                ['name' => 'D2GB Classic Logo Tee', 'price' => 29.99, 'slug' => 'classic-logo-tee'],
-                ['name' => 'D2GB Fight Shorts', 'price' => 49.99, 'slug' => 'fight-shorts'],
-                ['name' => 'D2GB Snapback Cap', 'price' => 24.99, 'slug' => 'snapback-cap'],
-            ],
-            'brands' => ['Fairtex', 'BKFC', 'Kingdom Muay', 'Yuth', 'DRC'],
+            'categories' => Category::where('is_active', true)
+                ->orderBy('position')
+                ->get(['id', 'name', 'slug', 'image']),
+
+            'bestSellers' => Product::where('is_active', true)
+                ->where('is_featured', true)
+                ->orderBy('id')
+                ->take(8)
+                ->get(['id', 'name', 'slug', 'price', 'image'])
+                ->map(fn (Product $p) => [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'slug' => $p->slug,
+                    'price' => (float) $p->price,
+                    'image' => $p->image,
+                ]),
+
+            'brands' => Brand::where('is_active', true)
+                ->orderBy('position')
+                ->pluck('name'),
+
+            // Content sections — still placeholder until a CMS/content phase.
             'fights' => [
                 ['title' => 'BKB 44 Denver Brawl', 'date' => 'AUG 16', 'location' => 'Denver, Colorado, USA'],
                 ['title' => 'Bare Knuckle Fighting Championship', 'date' => '', 'location' => 'New York, USA'],
