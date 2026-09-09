@@ -36,7 +36,7 @@ function addToCart(p: Product) {
 }
 
 const slides = [
-    { kicker: 'No Gloves. No Excuses.', title: 'DARE TO\nGO BARE', sub: 'Fightwear for warriors.\nBuilt for the bare knuckle lifestyle.' },
+    { kicker: 'The most feared callout in all combat sports.', title: 'DARE TO\nGO BARE', sub: 'Fightwear for warriors.\nBuilt for the bare knuckle lifestyle.' },
     { kicker: 'Train Like a Champion.', title: 'OWN THE\nRING', sub: 'Gear engineered for the grind.\nStep in and prove it.' },
     { kicker: 'Heart Over Everything.', title: 'BUILT\nDIFFERENT', sub: 'More than fightwear.\nA way of life.' },
 ];

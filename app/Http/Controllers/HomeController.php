@@ -27,7 +27,7 @@ class HomeController extends Controller
                     'name' => $p->name,
                     'slug' => $p->slug,
                     'price' => (float) $p->price,
-                    'image' => $p->image,
+                    'image' => $p->image_url,
                 ]),
 
             'brands' => Brand::where('is_active', true)

@@ -37,7 +37,9 @@ class ProductForm
                     ->numeric()
                     ->prefix('$'),
                 FileUpload::make('image')
-                    ->image(),
+                    ->image()
+                    ->disk('public')
+                    ->directory('products'),
                 TextInput::make('stock')
                     ->required()
                     ->numeric()

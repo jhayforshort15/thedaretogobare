@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -20,6 +22,28 @@ class Product extends Model
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Public, web-accessible URL for the product image (or null).
+     */
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::get(function (): ?string {
+            if (! $this->image) {
+                return null;
+            }
+
+            if (str_starts_with($this->image, 'http')) {
+                return $this->image;
+            }
+
+            // Root-relative URL so it resolves against the current origin
+            // (works across dev ports and production domains alike).
+            $path = ltrim(parse_url(Storage::disk('public')->url($this->image), PHP_URL_PATH) ?? '', '/');
+
+            return '/'.$path;
+        });
+    }
 
     public function category(): BelongsTo
     {

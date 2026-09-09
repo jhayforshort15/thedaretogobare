@@ -27,7 +27,7 @@ class ShopController extends Controller
                 'slug' => $p->slug,
                 'price' => (float) $p->price,
                 'compare_at_price' => $p->compare_at_price ? (float) $p->compare_at_price : null,
-                'image' => $p->image,
+                'image' => $p->image_url,
             ]);
 
         return Inertia::render('shop/Index', [
@@ -55,7 +55,7 @@ class ShopController extends Controller
                 'compare_at_price' => $product->compare_at_price ? (float) $product->compare_at_price : null,
                 'short_description' => $product->short_description,
                 'description' => $product->description,
-                'image' => $product->image,
+                'image' => $product->image_url,
                 'stock' => $product->stock,
                 'category' => $product->category?->only(['name', 'slug']),
                 'brand' => $product->brand?->only(['name', 'slug']),
@@ -73,7 +73,7 @@ class ShopController extends Controller
                     'name' => $p->name,
                     'slug' => $p->slug,
                     'price' => (float) $p->price,
-                    'image' => $p->image,
+                    'image' => $p->image_url,
                 ]),
         ]);
     }

@@ -105,7 +105,7 @@ class CartService
                     'product_id' => $product->id,
                     'name' => $product->name,
                     'slug' => $product->slug,
-                    'image' => $product->image,
+                    'image' => $product->image_url,
                     'size' => $line['size'],
                     'price' => $price,
                     'quantity' => $line['quantity'],

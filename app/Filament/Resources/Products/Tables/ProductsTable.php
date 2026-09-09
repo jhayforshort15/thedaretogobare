@@ -33,7 +33,8 @@ class ProductsTable
                 TextColumn::make('compare_at_price')
                     ->money()
                     ->sortable(),
-                ImageColumn::make('image'),
+                ImageColumn::make('image')
+                    ->disk('public'),
                 TextColumn::make('stock')
                     ->numeric()
                     ->sortable(),
