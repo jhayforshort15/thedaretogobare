@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { toast } from 'vue-sonner';
 import {
     ShoppingCart,
     ChevronLeft,
@@ -27,9 +28,11 @@ defineProps<{
     posts: Post[];
 }>();
 
-const cartCount = ref(0);
-function addToCart(_p: Product) {
-    cartCount.value++;
+function addToCart(p: Product) {
+    router.post('/cart', { product_id: p.id, quantity: 1 }, {
+        preserveScroll: true,
+        onSuccess: () => toast.success(`${p.name} added to your cart.`),
+    });
 }
 
 const slides = [
@@ -48,7 +51,7 @@ const money = (n: number) => `$${n.toFixed(2)}`;
     <Head title="Dare To Go Bare — Bare Knuckle Fightwear" />
 
     <div class="min-h-screen bg-d2gb-dark font-sans text-white">
-        <StoreHeader :cart-count="cartCount" />
+        <StoreHeader />
 
         <!-- Hero -->
         <section class="relative overflow-hidden bg-black">

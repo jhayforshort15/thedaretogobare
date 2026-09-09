@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
+import { toast } from 'vue-sonner';
 import { ShoppingCart, Minus, Plus, ShieldCheck, Truck, RefreshCw } from '@lucide/vue';
 import StoreHeader from '@/components/store/StoreHeader.vue';
 import StoreFooter from '@/components/store/StoreFooter.vue';
@@ -19,14 +20,20 @@ interface Product {
 
 const props = defineProps<{ product: Product; related: Related[] }>();
 
-const cartCount = ref(0);
 const selectedSize = ref<string | null>(props.product.sizes.length ? props.product.sizes[0] : null);
 const quantity = ref(1);
 const money = (n: number) => `$${n.toFixed(2)}`;
 const inStock = computed(() => props.product.stock > 0);
 
 function addToCart() {
-    cartCount.value += quantity.value;
+    router.post('/cart', {
+        product_id: props.product.id,
+        size: selectedSize.value,
+        quantity: quantity.value,
+    }, {
+        preserveScroll: true,
+        onSuccess: () => toast.success(`${props.product.name} added to your cart.`),
+    });
 }
 </script>
 
@@ -34,7 +41,7 @@ function addToCart() {
     <Head :title="`${product.name} | Dare To Go Bare`" />
 
     <div class="min-h-screen bg-d2gb-dark font-sans text-white">
-        <StoreHeader :cart-count="cartCount" />
+        <StoreHeader />
 
         <!-- Breadcrumb -->
         <div class="border-b border-white/10 bg-black">

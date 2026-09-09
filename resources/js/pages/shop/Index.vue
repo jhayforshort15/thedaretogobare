@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 import { ShoppingCart } from '@lucide/vue';
 import StoreHeader from '@/components/store/StoreHeader.vue';
 import StoreFooter from '@/components/store/StoreFooter.vue';
@@ -14,8 +14,11 @@ const props = defineProps<{
     activeCategory: string | null;
 }>();
 
-const cartCount = ref(0);
-const addToCart = (_p: Product) => cartCount.value++;
+const addToCart = (p: Product) =>
+    router.post('/cart', { product_id: p.id, quantity: 1 }, {
+        preserveScroll: true,
+        onSuccess: () => toast.success(`${p.name} added to your cart.`),
+    });
 const money = (n: number) => `$${n.toFixed(2)}`;
 
 const activeName = props.categories.find((c) => c.slug === props.activeCategory)?.name;
@@ -25,7 +28,7 @@ const activeName = props.categories.find((c) => c.slug === props.activeCategory)
     <Head :title="`Shop${activeName ? ' — ' + activeName : ''} | Dare To Go Bare`" />
 
     <div class="min-h-screen bg-d2gb-dark font-sans text-white">
-        <StoreHeader :cart-count="cartCount" />
+        <StoreHeader />
 
         <!-- Page header -->
         <section class="border-b border-white/10 bg-black">

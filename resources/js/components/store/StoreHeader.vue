@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import { Search, User, ShoppingCart, Menu } from '@lucide/vue';
 import { IconFacebook, IconInstagram, IconTiktok, IconYoutube } from './socialIcons';
 
-withDefaults(defineProps<{ cartCount?: number }>(), { cartCount: 0 });
+const page = usePage();
+const cartCount = computed<number>(() => (page.props.cart as { count?: number } | undefined)?.count ?? 0);
 
 const navLinks = [
     { label: 'Shop', href: '/shop' },
@@ -56,10 +58,10 @@ const navLinks = [
                 <div class="flex items-center gap-4 text-white/80">
                     <button class="transition hover:text-d2gb-gold" aria-label="Search"><Search class="h-5 w-5" /></button>
                     <Link href="/login" class="transition hover:text-d2gb-gold" aria-label="Account"><User class="h-5 w-5" /></Link>
-                    <button class="relative transition hover:text-d2gb-gold" aria-label="Cart">
+                    <Link href="/cart" class="relative transition hover:text-d2gb-gold" aria-label="Cart">
                         <ShoppingCart class="h-5 w-5" />
                         <span v-if="cartCount > 0" class="absolute -right-2 -top-2 grid h-4 w-4 place-items-center rounded-full bg-d2gb-gold text-[10px] font-bold text-black">{{ cartCount }}</span>
-                    </button>
+                    </Link>
                     <button class="lg:hidden" aria-label="Menu"><Menu class="h-6 w-6" /></button>
                 </div>
             </div>

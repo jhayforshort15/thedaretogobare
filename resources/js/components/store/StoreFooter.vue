@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { Toaster } from '@/components/ui/sonner';
 import { IconFacebook, IconInstagram, IconTiktok, IconYoutube } from './socialIcons';
 
 const shopLinks = [
@@ -74,5 +75,7 @@ const careLinks = ['Shipping & Delivery', 'Returns & Exchanges', 'Size Guide', '
             </div>
             <div class="border-t border-white/10 py-5 text-center text-xs">© 2024 Dare To Go Bare. All Rights Reserved.</div>
         </footer>
+
+        <Toaster position="top-center" rich-colors />
     </div>
 </template>
