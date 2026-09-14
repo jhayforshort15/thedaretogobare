@@ -28,6 +28,11 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('Dare To Go Bare')
+            ->brandLogo(asset('images/d2gb-logo.png'))
+            ->darkModeBrandLogo(asset('images/d2gb-logo-white.png'))
+            ->brandLogoHeight('2.75rem')
+            ->favicon(asset('images/d2gb-mark.png'))
             ->colors([
                 'primary' => Color::Amber,
             ])
