@@ -30,9 +30,8 @@
             }
         </style>
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" href="/images/d2gb-mark.png">
+        <link rel="apple-touch-icon" href="/images/d2gb-mark.png">
 
         {{-- D2GB brand fonts: Anton/Oswald display + Inter body --}}
         <link rel="preconnect" href="https://fonts.googleapis.com">

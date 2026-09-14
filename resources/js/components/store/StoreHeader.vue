@@ -37,11 +37,8 @@ const navLinks = [
         <!-- Header -->
         <header class="sticky top-0 z-40 border-b border-white/10 bg-d2gb-dark/95 backdrop-blur">
             <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
-                <Link href="/" class="flex items-center gap-2">
-                    <span class="grid h-11 w-11 place-items-center rounded-full border-2 border-d2gb-gold text-d2gb-gold">
-                        <span class="font-display text-lg leading-none">D2</span>
-                    </span>
-                    <span class="font-display text-lg leading-none tracking-wide text-white">DARE TO<br />GO BARE</span>
+                <Link href="/" class="flex items-center" aria-label="Dare To Go Bare — home">
+                    <img src="/images/d2gb-logo.png" alt="Dare To Go Bare" class="h-14 w-auto invert" />
                 </Link>
 
                 <nav class="hidden items-center gap-6 lg:flex">

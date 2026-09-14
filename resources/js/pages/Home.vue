@@ -67,9 +67,9 @@ const money = (n: number) => `$${n.toFixed(2)}`;
                         <a href="#fights" class="border border-white/40 px-8 py-3 font-heading text-sm font-bold uppercase tracking-wider text-white transition hover:border-d2gb-gold hover:text-d2gb-gold">Explore Fights</a>
                     </div>
                 </div>
-                <div class="relative hidden h-[420px] items-end justify-center md:flex">
+                <div class="relative hidden h-[420px] items-center justify-center md:flex">
                     <div class="absolute inset-0 rounded-lg bg-gradient-to-b from-neutral-800 to-neutral-950 opacity-70"></div>
-                    <div class="relative grid h-40 w-40 place-items-center rounded-full border-4 border-d2gb-gold/40 font-display text-4xl text-d2gb-gold/50">D2GB</div>
+                    <img src="/images/d2gb-logo.png" alt="Dare To Go Bare" class="relative w-80 invert opacity-90" />
                 </div>
             </div>
 
@@ -201,8 +201,8 @@ const money = (n: number) => `$${n.toFixed(2)}`;
                     </p>
                     <a href="#" class="mt-7 inline-block bg-d2gb-gold px-8 py-3 font-heading text-sm font-bold uppercase tracking-wider text-black transition hover:bg-d2gb-gold-light">Learn More</a>
                 </div>
-                <div class="relative flex h-72 items-center justify-center rounded-md bg-gradient-to-br from-neutral-800 to-neutral-950">
-                    <span class="grid h-40 w-40 place-items-center rounded-full border-4 border-white/20 font-display text-4xl text-white/40">D2GB</span>
+                <div class="relative flex h-72 items-center justify-center overflow-hidden rounded-md bg-gradient-to-br from-neutral-800 to-neutral-950">
+                    <img src="/images/d2gb-logo.png" alt="Dare To Go Bare" class="w-64 invert opacity-90" />
                 </div>
             </div>
         </section>

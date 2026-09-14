@@ -35,9 +35,8 @@ const careLinks = ['Shipping & Delivery', 'Returns & Exchanges', 'Size Guide', '
         <footer class="bg-black text-white/70">
             <div class="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-2 lg:grid-cols-4">
                 <div>
-                    <div class="mb-4 flex items-center gap-2">
-                        <span class="grid h-10 w-10 place-items-center rounded-full border-2 border-d2gb-gold font-display text-d2gb-gold">D2</span>
-                        <span class="font-display leading-none text-white">DARE TO<br />GO BARE</span>
+                    <div class="mb-4">
+                        <img src="/images/d2gb-logo.png" alt="Dare To Go Bare" class="h-20 w-auto invert" />
                     </div>
                     <p class="text-xs leading-relaxed">Premium fightwear for warriors. No gloves. No excuses.</p>
                     <div class="mt-4 flex gap-3 text-white/70">
