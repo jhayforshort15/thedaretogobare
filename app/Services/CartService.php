@@ -126,6 +126,30 @@ class CartService
         return (float) $this->items()->sum('subtotal');
     }
 
+    /** Free shipping at/over this order subtotal. */
+    public const FREE_SHIPPING_THRESHOLD = 150.0;
+
+    public const FLAT_SHIPPING = 10.0;
+
+    public function shipping(): float
+    {
+        if ($this->subtotal() <= 0) {
+            return 0.0;
+        }
+
+        return $this->subtotal() >= self::FREE_SHIPPING_THRESHOLD ? 0.0 : self::FLAT_SHIPPING;
+    }
+
+    public function tax(): float
+    {
+        return 0.0; // TODO: configure tax rate when required.
+    }
+
+    public function total(): float
+    {
+        return round($this->subtotal() + $this->shipping() + $this->tax(), 2);
+    }
+
     /**
      * Summary for sharing globally with the frontend.
      */

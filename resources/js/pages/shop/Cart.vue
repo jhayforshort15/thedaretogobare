@@ -119,12 +119,12 @@ const SHIPPING_THRESHOLD = 150;
                                 <span class="font-heading font-bold uppercase">Total</span>
                                 <span class="font-display text-2xl">{{ money(subtotal) }}</span>
                             </div>
-                            <button
-                                @click="toast.info('Checkout with Stripe is coming in the next phase!')"
+                            <Link
+                                href="/checkout"
                                 class="mt-6 flex w-full items-center justify-center gap-2 bg-neutral-900 py-4 font-heading text-sm font-bold uppercase tracking-wider text-white transition hover:bg-d2gb-gold hover:text-black"
                             >
                                 Proceed To Checkout <ArrowRight class="h-4 w-4" />
-                            </button>
+                            </Link>
                             <p class="mt-3 text-center text-xs text-neutral-400">Taxes calculated at checkout</p>
                         </div>
                     </div>
