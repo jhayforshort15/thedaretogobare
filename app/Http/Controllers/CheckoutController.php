@@ -4,16 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Services\CartService;
+use App\Services\StripeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CheckoutController extends Controller
 {
-    public function __construct(protected CartService $cart)
+    public function __construct(protected CartService $cart, protected StripeService $stripe)
     {
     }
 
@@ -90,20 +92,50 @@ class CheckoutController extends Controller
             return $order;
         });
 
-        // --- PHASE 4b (Stripe) SLOTS IN HERE ---
-        // Instead of clearing the cart and confirming immediately, we will
-        // create a Stripe PaymentIntent/Checkout Session for $order->total and
-        // redirect to payment. The order is marked paid via webhook on success.
-        // For now (first half) we place the order as "pending / unpaid".
+        // If Stripe is configured, send the customer to hosted Checkout to pay.
+        // The cart is cleared once payment is confirmed (success page + webhook).
+        if ($this->stripe->enabled()) {
+            try {
+                $order->load('items');
+                $session = $this->stripe->createCheckoutSession($order);
+                $order->update([
+                    'payment_method' => 'stripe',
+                    'payment_reference' => $session->id,
+                ]);
 
+                return Inertia::location($session->url);
+            } catch (\Throwable $e) {
+                Log::error('Stripe checkout session failed', ['order' => $order->order_number, 'error' => $e->getMessage()]);
+
+                return back()->withErrors(['payment' => 'We could not start the payment. Please try again.']);
+            }
+        }
+
+        // No payment gateway configured yet: place as pending/unpaid.
         $this->cart->clear();
 
         return redirect()->route('checkout.confirmation', $order->order_number);
     }
 
-    public function confirmation(string $orderNumber): Response
+    public function confirmation(Request $request, string $orderNumber): Response
     {
         $order = Order::where('order_number', $orderNumber)->with('items')->firstOrFail();
+
+        // Reconcile with Stripe when returning from hosted Checkout.
+        // (The webhook is authoritative; this makes the success page instant.)
+        $sessionId = $request->query('session_id');
+        if ($sessionId && $this->stripe->enabled() && $order->payment_status !== 'paid') {
+            try {
+                $session = $this->stripe->retrieveSession($sessionId);
+                if (($session->metadata->order_id ?? null) == (string) $order->id && $session->payment_status === 'paid') {
+                    $order->update(['status' => 'paid', 'payment_status' => 'paid']);
+                    $this->cart->clear();
+                    $order->refresh();
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Stripe session reconcile failed', ['order' => $order->order_number, 'error' => $e->getMessage()]);
+            }
+        }
 
         return Inertia::render('shop/OrderConfirmation', [
             'order' => [
