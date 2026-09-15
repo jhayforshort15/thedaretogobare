@@ -20,7 +20,7 @@ const form = useForm({
     shipping_city: '',
     shipping_state: '',
     shipping_postal_code: '',
-    shipping_country: 'Philippines',
+    shipping_country: 'United States',
     notes: '',
 });
 

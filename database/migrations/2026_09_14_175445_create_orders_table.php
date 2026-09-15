@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('shipping_city');
             $table->string('shipping_state')->nullable();
             $table->string('shipping_postal_code')->nullable();
-            $table->string('shipping_country')->default('Philippines');
+            $table->string('shipping_country')->default('United States');
 
             // Money
             $table->decimal('subtotal', 10, 2);
