@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use Stripe\Checkout\Session;
+use Stripe\PaymentIntent;
 use Stripe\StripeClient;
 
 class StripeService
@@ -70,5 +71,27 @@ class StripeService
     public function retrieveSession(string $sessionId): Session
     {
         return $this->client()->checkout->sessions->retrieve($sessionId);
+    }
+
+    /**
+     * Create a PaymentIntent for an order (used by the embedded Express Checkout Element).
+     */
+    public function createPaymentIntent(Order $order): PaymentIntent
+    {
+        return $this->client()->paymentIntents->create([
+            'amount' => (int) round(((float) $order->total) * 100),
+            'currency' => config('services.stripe.currency', 'usd'),
+            'automatic_payment_methods' => ['enabled' => true],
+            'receipt_email' => $order->email,
+            'metadata' => [
+                'order_id' => (string) $order->id,
+                'order_number' => $order->order_number,
+            ],
+        ]);
+    }
+
+    public function retrievePaymentIntent(string $id): PaymentIntent
+    {
+        return $this->client()->paymentIntents->retrieve($id);
     }
 }

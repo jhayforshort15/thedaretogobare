@@ -5,6 +5,7 @@ import { toast } from 'vue-sonner';
 import { ShoppingCart, Minus, Plus, ShieldCheck, Truck, RefreshCw } from '@lucide/vue';
 import StoreHeader from '@/components/store/StoreHeader.vue';
 import StoreFooter from '@/components/store/StoreFooter.vue';
+import ExpressCheckout from '@/components/store/ExpressCheckout.vue';
 
 interface Related { id: number; name: string; slug: string; price: number; image: string | null }
 interface Product {
@@ -119,6 +120,15 @@ function addToCart() {
                             {{ inStock ? 'Add To Cart' : 'Out of Stock' }} <ShoppingCart class="h-4 w-4" />
                         </button>
                     </div>
+
+                    <!-- Express wallet payments (Apple Pay / Google Pay / Link) -->
+                    <ExpressCheckout
+                        v-if="inStock"
+                        :product-id="product.id"
+                        :quantity="quantity"
+                        :size="selectedSize"
+                        :unit-price="product.price"
+                    />
 
                     <p class="mt-3 text-xs uppercase tracking-wide" :class="inStock ? 'text-green-600' : 'text-red-500'">
                         {{ inStock ? `In stock — ${product.stock} available` : 'Currently unavailable' }}

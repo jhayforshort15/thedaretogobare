@@ -43,6 +43,10 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'cart' => fn () => app(CartService::class)->summary(),
+            'stripe' => [
+                'key' => config('services.stripe.key'),
+                'enabled' => ! empty(config('services.stripe.secret')),
+            ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

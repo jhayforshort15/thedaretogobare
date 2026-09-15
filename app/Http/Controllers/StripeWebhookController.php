@@ -30,24 +30,40 @@ class StripeWebhookController extends Controller
 
         $type = $event->type ?? null;
 
+        // Hosted Checkout (redirect flow)
         if ($type === 'checkout.session.completed') {
             $session = $event->data->object;
             $orderId = $session->metadata->order_id ?? $session->client_reference_id ?? null;
 
             if ($orderId && ($session->payment_status ?? null) === 'paid') {
-                $order = Order::find($orderId);
+                $this->markPaid($orderId, $session->id ?? null);
+            }
+        }
 
-                if ($order && $order->payment_status !== 'paid') {
-                    $order->update([
-                        'status' => 'paid',
-                        'payment_status' => 'paid',
-                        'payment_method' => 'stripe',
-                        'payment_reference' => $session->id ?? $order->payment_reference,
-                    ]);
-                }
+        // Embedded Express Checkout Element (PaymentIntent flow)
+        if ($type === 'payment_intent.succeeded') {
+            $intent = $event->data->object;
+            $orderId = $intent->metadata->order_id ?? null;
+
+            if ($orderId) {
+                $this->markPaid($orderId, $intent->id ?? null);
             }
         }
 
         return response('OK', 200);
+    }
+
+    protected function markPaid(string|int $orderId, ?string $reference): void
+    {
+        $order = Order::find($orderId);
+
+        if ($order && $order->payment_status !== 'paid') {
+            $order->update([
+                'status' => 'paid',
+                'payment_status' => 'paid',
+                'payment_method' => 'stripe',
+                'payment_reference' => $reference ?? $order->payment_reference,
+            ]);
+        }
     }
 }

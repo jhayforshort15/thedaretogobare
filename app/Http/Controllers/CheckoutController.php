@@ -121,19 +121,33 @@ class CheckoutController extends Controller
     {
         $order = Order::where('order_number', $orderNumber)->with('items')->firstOrFail();
 
-        // Reconcile with Stripe when returning from hosted Checkout.
+        // Reconcile with Stripe when returning from Checkout.
         // (The webhook is authoritative; this makes the success page instant.)
         $sessionId = $request->query('session_id');
-        if ($sessionId && $this->stripe->enabled() && $order->payment_status !== 'paid') {
+        $paymentIntentId = $request->query('payment_intent');
+
+        if ($this->stripe->enabled() && $order->payment_status !== 'paid') {
             try {
-                $session = $this->stripe->retrieveSession($sessionId);
-                if (($session->metadata->order_id ?? null) == (string) $order->id && $session->payment_status === 'paid') {
-                    $order->update(['status' => 'paid', 'payment_status' => 'paid']);
-                    $this->cart->clear();
-                    $order->refresh();
+                // Hosted Checkout redirect
+                if ($sessionId) {
+                    $session = $this->stripe->retrieveSession($sessionId);
+                    if (($session->metadata->order_id ?? null) == (string) $order->id && $session->payment_status === 'paid') {
+                        $order->update(['status' => 'paid', 'payment_status' => 'paid']);
+                        $this->cart->clear();
+                        $order->refresh();
+                    }
+                }
+
+                // Embedded Express Checkout Element (PaymentIntent)
+                if ($paymentIntentId && $order->payment_status !== 'paid') {
+                    $intent = $this->stripe->retrievePaymentIntent($paymentIntentId);
+                    if (($intent->metadata->order_id ?? null) == (string) $order->id && $intent->status === 'succeeded') {
+                        $order->update(['status' => 'paid', 'payment_status' => 'paid']);
+                        $order->refresh();
+                    }
                 }
             } catch (\Throwable $e) {
-                Log::warning('Stripe session reconcile failed', ['order' => $order->order_number, 'error' => $e->getMessage()]);
+                Log::warning('Stripe reconcile failed', ['order' => $order->order_number, 'error' => $e->getMessage()]);
             }
         }
 
