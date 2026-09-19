@@ -6,6 +6,7 @@ import { IconFacebook, IconInstagram, IconTiktok, IconYoutube } from './socialIc
 
 const page = usePage();
 const cartCount = computed<number>(() => (page.props.cart as { count?: number } | undefined)?.count ?? 0);
+const authed = computed<boolean>(() => !!(page.props.auth as { user?: unknown } | undefined)?.user);
 
 const navLinks = [
     { label: 'Shop', href: '/shop' },
@@ -54,7 +55,7 @@ const navLinks = [
 
                 <div class="flex items-center gap-4 text-white/80">
                     <button class="transition hover:text-d2gb-gold" aria-label="Search"><Search class="h-5 w-5" /></button>
-                    <Link href="/login" class="transition hover:text-d2gb-gold" aria-label="Account"><User class="h-5 w-5" /></Link>
+                    <Link :href="authed ? '/account/orders' : '/login'" class="transition hover:text-d2gb-gold" aria-label="Account"><User class="h-5 w-5" /></Link>
                     <Link href="/cart" class="relative transition hover:text-d2gb-gold" aria-label="Cart">
                         <ShoppingCart class="h-5 w-5" />
                         <span v-if="cartCount > 0" class="absolute -right-2 -top-2 grid h-4 w-4 place-items-center rounded-full bg-d2gb-gold text-[10px] font-bold text-black">{{ cartCount }}</span>

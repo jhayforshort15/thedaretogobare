@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountOrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ExpressCheckoutController;
@@ -28,6 +29,10 @@ Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/account/orders', [AccountOrderController::class, 'index'])->name('account.orders');
 });
 
 require __DIR__.'/settings.php';

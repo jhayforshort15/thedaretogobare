@@ -4,6 +4,7 @@ import CartController from './CartController'
 import CheckoutController from './CheckoutController'
 import ExpressCheckoutController from './ExpressCheckoutController'
 import StripeWebhookController from './StripeWebhookController'
+import AccountOrderController from './AccountOrderController'
 import Settings from './Settings'
 
 const Controllers = {
@@ -13,6 +14,7 @@ const Controllers = {
     CheckoutController: Object.assign(CheckoutController, CheckoutController),
     ExpressCheckoutController: Object.assign(ExpressCheckoutController, ExpressCheckoutController),
     StripeWebhookController: Object.assign(StripeWebhookController, StripeWebhookController),
+    AccountOrderController: Object.assign(AccountOrderController, AccountOrderController),
     Settings: Object.assign(Settings, Settings),
 }
 
