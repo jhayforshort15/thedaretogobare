@@ -5,6 +5,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ExpressCheckoutController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrderLookupController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,9 @@ Route::get('/checkout/confirmation/{orderNumber}', [CheckoutController::class, '
 
 Route::post('/express/intent', [ExpressCheckoutController::class, 'intent'])->name('express.intent');
 
+Route::get('/order-lookup', [OrderLookupController::class, 'form'])->name('order.lookup');
+Route::post('/order-lookup', [OrderLookupController::class, 'find'])->name('order.lookup.find');
+
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -33,6 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/account/orders', [AccountOrderController::class, 'index'])->name('account.orders');
+    Route::get('/account/orders/{orderNumber}', [AccountOrderController::class, 'show'])->name('account.orders.show');
 });
 
 require __DIR__.'/settings.php';

@@ -12,7 +12,13 @@ const shopLinks = [
     { label: 'Sale', href: '/shop' },
 ];
 const companyLinks = ['About Us', 'Our Story', 'Blog', 'Careers', 'Contact Us'];
-const careLinks = ['Shipping & Delivery', 'Returns & Exchanges', 'Size Guide', 'FAQ', 'Track Your Order'];
+const careLinks = [
+    { label: 'Shipping & Delivery', href: '#' },
+    { label: 'Returns & Exchanges', href: '#' },
+    { label: 'Size Guide', href: '#' },
+    { label: 'FAQ', href: '#' },
+    { label: 'Track Your Order', href: '/order-lookup' },
+];
 </script>
 
 <template>
@@ -61,7 +67,7 @@ const careLinks = ['Shipping & Delivery', 'Returns & Exchanges', 'Size Guide', '
                 <div>
                     <h4 class="mb-4 font-heading text-sm font-bold uppercase text-white">Customer Care</h4>
                     <ul class="space-y-2 text-xs">
-                        <li v-for="i in careLinks" :key="i"><a href="#" class="hover:text-d2gb-gold">{{ i }}</a></li>
+                        <li v-for="i in careLinks" :key="i.label"><Link :href="i.href" class="hover:text-d2gb-gold">{{ i.label }}</Link></li>
                     </ul>
                     <p class="mt-5 font-heading text-xs font-bold uppercase text-white">We Accept</p>
                     <div class="mt-2 flex gap-2 text-[10px] font-bold">

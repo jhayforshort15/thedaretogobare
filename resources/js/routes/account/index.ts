@@ -1,4 +1,5 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
+import ordersB47e5f from './orders'
 /**
 * @see \App\Http\Controllers\AccountOrderController::orders
 * @see app/Http/Controllers/AccountOrderController.php:12
@@ -81,7 +82,7 @@ ordersForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 orders.form = ordersForm
 
 const account = {
-    orders: Object.assign(orders, orders),
+    orders: Object.assign(orders, ordersB47e5f),
 }
 
 export default account

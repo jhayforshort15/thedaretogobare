@@ -28,4 +28,15 @@ class AccountOrderController extends Controller
             'orders' => $orders,
         ]);
     }
+
+    public function show(Request $request, string $orderNumber): Response
+    {
+        $order = Order::where('user_id', $request->user()->id)
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        return Inertia::render('account/OrderShow', [
+            'order' => $order->toDisplayArray(),
+        ]);
+    }
 }

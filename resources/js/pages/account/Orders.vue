@@ -49,10 +49,11 @@ const statusClass = (status: string) => {
             <div class="mx-auto max-w-5xl px-4 py-12">
                 <!-- Orders list -->
                 <div v-if="orders.length" class="space-y-4">
-                    <div
+                    <Link
                         v-for="order in orders"
                         :key="order.order_number"
-                        class="flex flex-col gap-4 rounded-md border border-neutral-200 p-5 sm:flex-row sm:items-center sm:justify-between"
+                        :href="`/account/orders/${order.order_number}`"
+                        class="flex flex-col gap-4 rounded-md border border-neutral-200 p-5 transition hover:border-neutral-900 sm:flex-row sm:items-center sm:justify-between"
                     >
                         <div>
                             <p class="font-heading text-sm font-bold uppercase">Order #{{ order.order_number }}</p>
@@ -66,7 +67,7 @@ const statusClass = (status: string) => {
                             </span>
                             <span class="font-display text-xl">{{ money(order.total) }}</span>
                         </div>
-                    </div>
+                    </Link>
                 </div>
 
                 <!-- Empty state -->
