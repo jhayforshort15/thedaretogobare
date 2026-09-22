@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
 use App\Models\Product;
 use App\Services\CartService;
+use App\Services\OrderNotifier;
 use App\Services\StripeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class ExpressCheckoutController extends Controller
 {
-    public function __construct(protected StripeService $stripe)
+    public function __construct(protected StripeService $stripe, protected OrderNotifier $notifier)
     {
     }
 
@@ -94,11 +93,7 @@ class ExpressCheckoutController extends Controller
             return response()->json(['message' => 'Could not start payment.'], 500);
         }
 
-        try {
-            Mail::to($order->email)->send(new OrderConfirmationMail($order));
-        } catch (\Throwable $e) {
-            Log::warning('Order confirmation email failed', ['order' => $order->order_number, 'error' => $e->getMessage()]);
-        }
+        $this->notifier->notifyPlaced($order);
 
         return response()->json([
             'client_secret' => $clientSecret,

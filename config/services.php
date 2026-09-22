@@ -42,4 +42,9 @@ return [
         'currency' => env('STRIPE_CURRENCY', 'usd'),
     ],
 
+    'store' => [
+        // Where new-order notifications are sent (defaults to the mail "from" address).
+        'order_notification_email' => env('ORDER_ADMIN_EMAIL') ?: env('MAIL_FROM_ADDRESS'),
+    ],
+
 ];
