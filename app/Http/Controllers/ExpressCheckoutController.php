@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
 use App\Models\Product;
 use App\Services\CartService;
@@ -10,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class ExpressCheckoutController extends Controller
@@ -90,6 +92,12 @@ class ExpressCheckoutController extends Controller
             Log::error('Express checkout intent failed', ['error' => $e->getMessage()]);
 
             return response()->json(['message' => 'Could not start payment.'], 500);
+        }
+
+        try {
+            Mail::to($order->email)->send(new OrderConfirmationMail($order));
+        } catch (\Throwable $e) {
+            Log::warning('Order confirmation email failed', ['order' => $order->order_number, 'error' => $e->getMessage()]);
         }
 
         return response()->json([

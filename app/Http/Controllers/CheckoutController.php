@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
 use App\Services\CartService;
 use App\Services\StripeService;
@@ -9,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -92,6 +94,8 @@ class CheckoutController extends Controller
             return $order;
         });
 
+        $this->sendOrderConfirmation($order);
+
         // If Stripe is configured, send the customer to hosted Checkout to pay.
         // The cart is cleared once payment is confirmed (success page + webhook).
         if ($this->stripe->enabled()) {
@@ -115,6 +119,18 @@ class CheckoutController extends Controller
         $this->cart->clear();
 
         return redirect()->route('checkout.confirmation', $order->order_number);
+    }
+
+    /**
+     * Send the customer their order confirmation email (never blocks checkout).
+     */
+    protected function sendOrderConfirmation(Order $order): void
+    {
+        try {
+            Mail::to($order->email)->send(new OrderConfirmationMail($order));
+        } catch (\Throwable $e) {
+            Log::warning('Order confirmation email failed', ['order' => $order->order_number, 'error' => $e->getMessage()]);
+        }
     }
 
     public function confirmation(Request $request, string $orderNumber): Response
