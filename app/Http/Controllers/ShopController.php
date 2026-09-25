@@ -19,8 +19,9 @@ class ShopController extends Controller
             ->when($activeCategory, function ($query) use ($activeCategory) {
                 $query->whereHas('category', fn ($q) => $q->where('slug', $activeCategory));
             })
+            ->withCount(['variants as size_count' => fn ($q) => $q->whereNotNull('size')])
             ->orderBy('name')
-            ->get(['id', 'name', 'slug', 'price', 'compare_at_price', 'image', 'category_id'])
+            ->get(['id', 'name', 'slug', 'price', 'compare_at_price', 'image', 'category_id', 'stock'])
             ->map(fn (Product $p) => [
                 'id' => $p->id,
                 'name' => $p->name,
@@ -28,6 +29,8 @@ class ShopController extends Controller
                 'price' => (float) $p->price,
                 'compare_at_price' => $p->compare_at_price ? (float) $p->compare_at_price : null,
                 'image' => $p->image_url,
+                'has_sizes' => $p->size_count > 0,
+                'in_stock' => $p->stock > 0,
             ]);
 
         return Inertia::render('shop/Index', [

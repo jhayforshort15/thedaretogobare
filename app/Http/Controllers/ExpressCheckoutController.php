@@ -46,6 +46,10 @@ class ExpressCheckoutController extends Controller
 
         $product = Product::where('is_active', true)->findOrFail($data['product_id']);
 
+        if ($product->stock < $data['quantity']) {
+            return response()->json(['message' => "Only {$product->stock} left in stock."], 422);
+        }
+
         $subtotal = round((float) $product->price * $data['quantity'], 2);
         $shipping = $subtotal >= CartService::FREE_SHIPPING_THRESHOLD ? 0.0 : CartService::FLAT_SHIPPING;
         $total = round($subtotal + $shipping, 2);
@@ -81,6 +85,8 @@ class ExpressCheckoutController extends Controller
                     'quantity' => $data['quantity'],
                     'subtotal' => $subtotal,
                 ]);
+
+                $product->decrementStock($data['size'] ?? null, $data['quantity']);
 
                 $intent = $this->stripe->createPaymentIntent($order);
                 $order->update(['payment_reference' => $intent->id]);

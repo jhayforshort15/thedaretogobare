@@ -138,7 +138,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\CartController::update
-* @see app/Http/Controllers/CartController.php:41
+* @see app/Http/Controllers/CartController.php:56
 * @route '/cart/{rowId}'
 */
 export const update = (args: { rowId: string | number } | [rowId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -153,7 +153,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\CartController::update
-* @see app/Http/Controllers/CartController.php:41
+* @see app/Http/Controllers/CartController.php:56
 * @route '/cart/{rowId}'
 */
 update.url = (args: { rowId: string | number } | [rowId: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -180,7 +180,7 @@ update.url = (args: { rowId: string | number } | [rowId: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\CartController::update
-* @see app/Http/Controllers/CartController.php:41
+* @see app/Http/Controllers/CartController.php:56
 * @route '/cart/{rowId}'
 */
 update.patch = (args: { rowId: string | number } | [rowId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -190,7 +190,7 @@ update.patch = (args: { rowId: string | number } | [rowId: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\CartController::update
-* @see app/Http/Controllers/CartController.php:41
+* @see app/Http/Controllers/CartController.php:56
 * @route '/cart/{rowId}'
 */
 const updateForm = (args: { rowId: string | number } | [rowId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -205,7 +205,7 @@ const updateForm = (args: { rowId: string | number } | [rowId: string | number ]
 
 /**
 * @see \App\Http\Controllers\CartController::update
-* @see app/Http/Controllers/CartController.php:41
+* @see app/Http/Controllers/CartController.php:56
 * @route '/cart/{rowId}'
 */
 updateForm.patch = (args: { rowId: string | number } | [rowId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -222,7 +222,7 @@ update.form = updateForm
 
 /**
 * @see \App\Http\Controllers\CartController::destroy
-* @see app/Http/Controllers/CartController.php:52
+* @see app/Http/Controllers/CartController.php:67
 * @route '/cart/{rowId}'
 */
 export const destroy = (args: { rowId: string | number } | [rowId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -237,7 +237,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\CartController::destroy
-* @see app/Http/Controllers/CartController.php:52
+* @see app/Http/Controllers/CartController.php:67
 * @route '/cart/{rowId}'
 */
 destroy.url = (args: { rowId: string | number } | [rowId: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -264,7 +264,7 @@ destroy.url = (args: { rowId: string | number } | [rowId: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\CartController::destroy
-* @see app/Http/Controllers/CartController.php:52
+* @see app/Http/Controllers/CartController.php:67
 * @route '/cart/{rowId}'
 */
 destroy.delete = (args: { rowId: string | number } | [rowId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -274,7 +274,7 @@ destroy.delete = (args: { rowId: string | number } | [rowId: string | number ] |
 
 /**
 * @see \App\Http\Controllers\CartController::destroy
-* @see app/Http/Controllers/CartController.php:52
+* @see app/Http/Controllers/CartController.php:67
 * @route '/cart/{rowId}'
 */
 const destroyForm = (args: { rowId: string | number } | [rowId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -289,7 +289,7 @@ const destroyForm = (args: { rowId: string | number } | [rowId: string | number 
 
 /**
 * @see \App\Http\Controllers\CartController::destroy
-* @see app/Http/Controllers/CartController.php:52
+* @see app/Http/Controllers/CartController.php:67
 * @route '/cart/{rowId}'
 */
 destroyForm.delete = (args: { rowId: string | number } | [rowId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

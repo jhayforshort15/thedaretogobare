@@ -32,8 +32,23 @@ class CartController extends Controller
         ]);
 
         $product = Product::where('is_active', true)->findOrFail($data['product_id']);
+        $size = $data['size'] ?? null;
+        $quantity = $data['quantity'] ?? 1;
 
-        $this->cart->add($product, $data['size'] ?? null, $data['quantity'] ?? 1);
+        // Require a size when the product has size variants.
+        if ($product->variants()->whereNotNull('size')->exists() && empty($size)) {
+            return back()->withErrors(['size' => 'Please choose a size first.']);
+        }
+
+        // Block adding out-of-stock items (accounts for what's already in the cart).
+        $alreadyInCart = collect($this->cart->items())
+            ->firstWhere('row_id', $product->id.'-'.($size ?: 'default'))['quantity'] ?? 0;
+
+        if ($product->stock < ($alreadyInCart + $quantity)) {
+            return back()->withErrors(['stock' => "Sorry, only {$product->stock} of {$product->name} left in stock."]);
+        }
+
+        $this->cart->add($product, $size, $quantity);
 
         return back(fallback: '/cart')->with('success', "{$product->name} added to your cart.");
     }

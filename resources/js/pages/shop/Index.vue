@@ -6,7 +6,7 @@ import StoreHeader from '@/components/store/StoreHeader.vue';
 import StoreFooter from '@/components/store/StoreFooter.vue';
 
 interface Category { id: number; name: string; slug: string }
-interface Product { id: number; name: string; slug: string; price: number; compare_at_price: number | null; image: string | null }
+interface Product { id: number; name: string; slug: string; price: number; compare_at_price: number | null; image: string | null; has_sizes: boolean; in_stock: boolean }
 
 const props = defineProps<{
     products: Product[];
@@ -18,6 +18,7 @@ const addToCart = (p: Product) =>
     router.post('/cart', { product_id: p.id, quantity: 1 }, {
         preserveScroll: true,
         onSuccess: () => toast.success(`${p.name} added to your cart.`),
+        onError: (errors) => toast.error(Object.values(errors)[0] ?? 'Could not add to cart.'),
     });
 const money = (n: number) => `$${n.toFixed(2)}`;
 
@@ -81,7 +82,18 @@ const activeName = props.categories.find((c) => c.slug === props.activeCategory)
                             <span class="font-display text-lg">{{ money(p.price) }}</span>
                             <span v-if="p.compare_at_price" class="text-sm text-neutral-400 line-through">{{ money(p.compare_at_price) }}</span>
                         </p>
+                        <span v-if="!p.in_stock" class="mt-3 flex w-full items-center justify-center gap-2 bg-neutral-200 py-3 font-heading text-xs font-bold uppercase tracking-wider text-neutral-500">
+                            Out of Stock
+                        </span>
+                        <Link
+                            v-else-if="p.has_sizes"
+                            :href="`/shop/${p.slug}`"
+                            class="mt-3 flex w-full items-center justify-center gap-2 bg-neutral-900 py-3 font-heading text-xs font-bold uppercase tracking-wider text-white transition hover:bg-d2gb-gold hover:text-black"
+                        >
+                            Select Options
+                        </Link>
                         <button
+                            v-else
                             @click="addToCart(p)"
                             class="mt-3 flex w-full items-center justify-center gap-2 bg-neutral-900 py-3 font-heading text-xs font-bold uppercase tracking-wider text-white transition hover:bg-d2gb-gold hover:text-black"
                         >

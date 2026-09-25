@@ -34,6 +34,7 @@ function addToCart() {
     }, {
         preserveScroll: true,
         onSuccess: () => toast.success(`${props.product.name} added to your cart.`),
+        onError: (errors) => toast.error(Object.values(errors)[0] ?? 'Could not add to cart.'),
     });
 }
 </script>

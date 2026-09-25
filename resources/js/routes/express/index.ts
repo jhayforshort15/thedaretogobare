@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\ExpressCheckoutController::intent
-* @see app/Http/Controllers/ExpressCheckoutController.php:25
+* @see app/Http/Controllers/ExpressCheckoutController.php:26
 * @route '/express/intent'
 */
 export const intent = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ intent.definition = {
 
 /**
 * @see \App\Http\Controllers\ExpressCheckoutController::intent
-* @see app/Http/Controllers/ExpressCheckoutController.php:25
+* @see app/Http/Controllers/ExpressCheckoutController.php:26
 * @route '/express/intent'
 */
 intent.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ intent.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ExpressCheckoutController::intent
-* @see app/Http/Controllers/ExpressCheckoutController.php:25
+* @see app/Http/Controllers/ExpressCheckoutController.php:26
 * @route '/express/intent'
 */
 intent.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ intent.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\ExpressCheckoutController::intent
-* @see app/Http/Controllers/ExpressCheckoutController.php:25
+* @see app/Http/Controllers/ExpressCheckoutController.php:26
 * @route '/express/intent'
 */
 const intentForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -45,7 +45,7 @@ const intentForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> =>
 
 /**
 * @see \App\Http\Controllers\ExpressCheckoutController::intent
-* @see app/Http/Controllers/ExpressCheckoutController.php:25
+* @see app/Http/Controllers/ExpressCheckoutController.php:26
 * @route '/express/intent'
 */
 intentForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

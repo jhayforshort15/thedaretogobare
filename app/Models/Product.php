@@ -60,6 +60,20 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
+    /**
+     * Reduce stock for this product (and the matching size variant) after a sale.
+     */
+    public function decrementStock(?string $size, int $quantity): void
+    {
+        $this->decrement('stock', min($quantity, $this->stock));
+
+        if ($size) {
+            $this->variants()->where('size', $size)->each(
+                fn (ProductVariant $variant) => $variant->decrement('stock', min($quantity, $variant->stock)),
+            );
+        }
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('position');

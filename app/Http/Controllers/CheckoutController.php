@@ -69,6 +69,11 @@ class CheckoutController extends Controller
 
         $items = $this->cart->items();
 
+        // Make sure nothing in the cart exceeds available stock before charging.
+        if ($stockError = $this->checkStock($items)) {
+            return redirect()->route('cart.index')->withErrors(['stock' => $stockError]);
+        }
+
         $order = DB::transaction(function () use ($data, $items, $request) {
             $order = Order::create([
                 ...$data,
@@ -91,6 +96,8 @@ class CheckoutController extends Controller
                     'quantity' => $item['quantity'],
                     'subtotal' => $item['subtotal'],
                 ]);
+
+                Product::find($item['product_id'])?->decrementStock($item['size'], $item['quantity']);
             }
 
             return $order;
@@ -121,6 +128,27 @@ class CheckoutController extends Controller
         $this->cart->clear();
 
         return redirect()->route('checkout.confirmation', $order->order_number);
+    }
+
+    /**
+     * Returns an error message if any cart item exceeds available stock, else null.
+     */
+    protected function checkStock(\Illuminate\Support\Collection $items): ?string
+    {
+        $products = Product::whereIn('id', $items->pluck('product_id'))->get()->keyBy('id');
+
+        foreach ($items as $item) {
+            $product = $products->get($item['product_id']);
+
+            if (! $product || ! $product->is_active || $product->stock < $item['quantity']) {
+                $name = $product?->name ?? 'An item in your cart';
+                $available = $product?->stock ?? 0;
+
+                return "{$name} is no longer available in that quantity (only {$available} left). Please update your cart.";
+            }
+        }
+
+        return null;
     }
 
     public function confirmation(Request $request, string $orderNumber): Response

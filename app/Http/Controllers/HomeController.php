@@ -19,15 +19,18 @@ class HomeController extends Controller
 
             'bestSellers' => Product::where('is_active', true)
                 ->where('is_featured', true)
+                ->withCount(['variants as size_count' => fn ($q) => $q->whereNotNull('size')])
                 ->orderBy('id')
                 ->take(8)
-                ->get(['id', 'name', 'slug', 'price', 'image'])
+                ->get(['id', 'name', 'slug', 'price', 'image', 'stock'])
                 ->map(fn (Product $p) => [
                     'id' => $p->id,
                     'name' => $p->name,
                     'slug' => $p->slug,
                     'price' => (float) $p->price,
                     'image' => $p->image_url,
+                    'has_sizes' => $p->size_count > 0,
+                    'in_stock' => $p->stock > 0,
                 ]),
 
             'brands' => Brand::where('is_active', true)
