@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Mail\NewOrderMail;
 use App\Mail\OrderConfirmationMail;
+use App\Mail\OrderStatusUpdateMail;
 use App\Models\Order;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -23,6 +24,14 @@ class OrderNotifier
         if (! empty($adminEmail)) {
             $this->safely(fn () => Mail::to($adminEmail)->send(new NewOrderMail($order)), $order, 'admin notification');
         }
+    }
+
+    /**
+     * Notify the customer that their order status changed.
+     */
+    public function notifyStatusChanged(Order $order): void
+    {
+        $this->safely(fn () => Mail::to($order->email)->send(new OrderStatusUpdateMail($order)), $order, 'status update');
     }
 
     protected function safely(callable $send, Order $order, string $label): void
