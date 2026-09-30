@@ -11,7 +11,13 @@ const shopLinks = [
     { label: 'Fight Gear', href: '/shop?category=fight-gear' },
     { label: 'Sale', href: '/shop' },
 ];
-const companyLinks = ['About Us', 'Our Story', 'Blog', 'Careers', 'Contact Us'];
+const companyLinks = [
+    { label: 'About Us', href: '/about' },
+    { label: 'Our Story', href: '/about' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Careers', href: '#' },
+    { label: 'Contact Us', href: '/contact-us' },
+];
 const careLinks = [
     { label: 'Shipping & Delivery', href: '#' },
     { label: 'Returns & Exchanges', href: '#' },
@@ -61,7 +67,7 @@ const careLinks = [
                 <div>
                     <h4 class="mb-4 font-heading text-sm font-bold uppercase text-white">Company</h4>
                     <ul class="space-y-2 text-xs">
-                        <li v-for="i in companyLinks" :key="i"><a href="#" class="hover:text-d2gb-gold">{{ i }}</a></li>
+                        <li v-for="i in companyLinks" :key="i.label"><Link :href="i.href" class="hover:text-d2gb-gold">{{ i.label }}</Link></li>
                     </ul>
                 </div>
                 <div>

@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AccountOrderController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ExpressCheckoutController;
 use App\Http\Controllers\HomeController;
@@ -28,6 +30,14 @@ Route::post('/express/intent', [ExpressCheckoutController::class, 'intent'])->na
 
 Route::get('/order-lookup', [OrderLookupController::class, 'form'])->name('order.lookup');
 Route::post('/order-lookup', [OrderLookupController::class, 'find'])->name('order.lookup.find');
+
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.show');
+
+Route::get('/contact-us', [ContactController::class, 'show'])->name('contact');
+Route::post('/contact-us', [ContactController::class, 'submit'])->name('contact.submit');
+
+Route::inertia('/about', 'pages/About')->name('about');
 
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
 

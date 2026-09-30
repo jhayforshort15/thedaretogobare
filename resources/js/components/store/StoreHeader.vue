@@ -15,7 +15,7 @@ const navLinks = [
     { label: 'Unisex', href: '/shop?category=unisex' },
     { label: 'Fightwear', href: '/shop?category=fight-gear' },
     { label: 'Upcoming Fights', href: '/#fights' },
-    { label: 'About', href: '/#about' },
+    { label: 'About', href: '/about' },
 ];
 </script>
 

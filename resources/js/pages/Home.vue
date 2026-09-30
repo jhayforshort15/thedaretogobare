@@ -17,8 +17,8 @@ import StoreFooter from '@/components/store/StoreFooter.vue';
 
 interface Category { id: number; name: string; slug: string }
 interface Product { id: number; name: string; price: number; slug: string; image: string | null; has_sizes: boolean; in_stock: boolean }
-interface Fight { title: string; date: string; location: string }
-interface Post { title: string; date: string; slug: string }
+interface Fight { title: string; date: string; location: string; url: string | null }
+interface Post { title: string; date: string; slug: string; image: string | null }
 
 defineProps<{
     categories: Category[];
@@ -196,7 +196,7 @@ const money = (n: number) => `$${n.toFixed(2)}`;
                         <p v-if="f.date" class="font-heading text-xs font-bold uppercase tracking-widest text-d2gb-gold">{{ f.date }}</p>
                         <h3 class="mt-2 font-display text-2xl uppercase leading-tight">{{ f.title }}</h3>
                         <p class="mt-1 text-xs uppercase tracking-wide text-white/60">{{ f.location }}</p>
-                        <a href="#" class="mx-auto mt-4 bg-d2gb-gold px-5 py-2 font-heading text-xs font-bold uppercase tracking-wider text-black transition hover:bg-d2gb-gold-light">View Event</a>
+                        <a v-if="f.url" :href="f.url" target="_blank" rel="noopener" class="mx-auto mt-4 bg-d2gb-gold px-5 py-2 font-heading text-xs font-bold uppercase tracking-wider text-black transition hover:bg-d2gb-gold-light">View Event</a>
                     </div>
                 </div>
             </div>
@@ -211,7 +211,7 @@ const money = (n: number) => `$${n.toFixed(2)}`;
                     <p class="mt-5 text-sm leading-relaxed text-white/70">
                         Dare To Go Bare is a lifestyle. It's about heart, discipline, and the courage to show up—every single day.
                     </p>
-                    <a href="#" class="mt-7 inline-block bg-d2gb-gold px-8 py-3 font-heading text-sm font-bold uppercase tracking-wider text-black transition hover:bg-d2gb-gold-light">Learn More</a>
+                    <Link href="/about" class="mt-7 inline-block bg-d2gb-gold px-8 py-3 font-heading text-sm font-bold uppercase tracking-wider text-black transition hover:bg-d2gb-gold-light">Learn More</Link>
                 </div>
                 <div class="relative flex h-72 items-center justify-center overflow-hidden rounded-md bg-gradient-to-br from-neutral-800 to-neutral-950">
                     <img src="/images/d2gb-logo.png" alt="Dare To Go Bare" class="w-64 invert opacity-90" />
@@ -227,14 +227,16 @@ const money = (n: number) => `$${n.toFixed(2)}`;
                         <p class="font-heading text-xs font-bold uppercase tracking-widest text-d2gb-gold">Latest News</p>
                         <h2 class="font-display text-4xl uppercase md:text-5xl">From The D2GB Blog</h2>
                     </div>
-                    <a href="#" class="hidden items-center gap-1 font-heading text-xs font-bold uppercase tracking-wide hover:text-d2gb-gold sm:flex">View All Articles <ArrowRight class="h-3 w-3" /></a>
+                    <Link href="/blog" class="hidden items-center gap-1 font-heading text-xs font-bold uppercase tracking-wide hover:text-d2gb-gold sm:flex">View All Articles <ArrowRight class="h-3 w-3" /></Link>
                 </div>
                 <div class="grid gap-6 md:grid-cols-3">
-                    <a v-for="post in posts" :key="post.slug" href="#" class="group">
-                        <div class="mb-4 h-48 overflow-hidden rounded-md bg-gradient-to-br from-neutral-300 to-neutral-500"></div>
+                    <Link v-for="post in posts" :key="post.slug" :href="`/blog/${post.slug}`" class="group">
+                        <div class="mb-4 h-48 overflow-hidden rounded-md bg-gradient-to-br from-neutral-300 to-neutral-500">
+                            <img v-if="post.image" :src="post.image" :alt="post.title" class="h-full w-full object-cover" />
+                        </div>
                         <h3 class="font-heading text-base font-semibold uppercase leading-snug transition group-hover:text-d2gb-gold">{{ post.title }}</h3>
                         <p class="mt-1 text-xs uppercase tracking-wide text-neutral-500">{{ post.date }}</p>
-                    </a>
+                    </Link>
                 </div>
             </div>
         </section>
