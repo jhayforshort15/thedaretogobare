@@ -5,6 +5,8 @@ interface Order {
     placed_at: string | null;
     status: string;
     payment_status: string;
+    tracking_number: string | null;
+    tracking_url: string | null;
     email: string;
     first_name: string;
     last_name: string;
@@ -48,6 +50,15 @@ const statusClass = (status: string) => {
                 <span :class="['rounded px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide', statusClass(order.status)]">{{ order.status }}</span>
                 <span :class="['rounded px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide', order.payment_status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-neutral-200 text-neutral-600']">{{ order.payment_status }}</span>
             </div>
+        </div>
+
+        <!-- Tracking -->
+        <div v-if="order.tracking_number" class="border-b border-neutral-200 bg-neutral-50 px-6 py-4">
+            <p class="font-heading text-xs font-bold uppercase text-neutral-500">Tracking</p>
+            <p class="mt-1 text-sm">
+                <a v-if="order.tracking_url" :href="order.tracking_url" target="_blank" rel="noopener" class="font-semibold text-d2gb-gold hover:underline">{{ order.tracking_number }}</a>
+                <span v-else class="font-semibold">{{ order.tracking_number }}</span>
+            </p>
         </div>
 
         <!-- Items -->

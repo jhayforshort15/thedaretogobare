@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 class Product extends Model
 {
     protected $fillable = [
+        'printify_product_id',
         'category_id', 'brand_id', 'name', 'slug', 'sku',
         'short_description', 'description', 'price', 'compare_at_price',
         'image', 'stock', 'is_featured', 'is_active',

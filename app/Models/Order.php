@@ -17,6 +17,7 @@ class Order extends Model
         'shipping_address', 'shipping_city', 'shipping_state', 'shipping_postal_code', 'shipping_country',
         'subtotal', 'shipping_cost', 'tax', 'total',
         'status', 'payment_status', 'payment_method', 'payment_reference', 'notes',
+        'printify_order_id', 'tracking_number', 'tracking_url',
     ];
 
     protected $casts = [
@@ -48,6 +49,8 @@ class Order extends Model
             'placed_at' => $this->created_at?->format('M j, Y g:i A'),
             'status' => $this->status,
             'payment_status' => $this->payment_status,
+            'tracking_number' => $this->tracking_number,
+            'tracking_url' => $this->tracking_url,
             'email' => $this->email,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,

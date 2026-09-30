@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProductVariant extends Model
 {
     protected $fillable = [
+        'printify_variant_id',
         'product_id', 'size', 'color', 'sku', 'price_override', 'stock',
     ];
 

@@ -40,6 +40,7 @@ Route::post('/contact-us', [ContactController::class, 'submit'])->name('contact.
 Route::inertia('/about', 'pages/About')->name('about');
 
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
+Route::post('/printify/webhook', [\App\Http\Controllers\PrintifyWebhookController::class, 'handle'])->name('printify.webhook');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

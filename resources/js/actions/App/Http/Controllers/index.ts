@@ -7,6 +7,7 @@ import OrderLookupController from './OrderLookupController'
 import BlogController from './BlogController'
 import ContactController from './ContactController'
 import StripeWebhookController from './StripeWebhookController'
+import PrintifyWebhookController from './PrintifyWebhookController'
 import AccountOrderController from './AccountOrderController'
 import Settings from './Settings'
 
@@ -20,6 +21,7 @@ const Controllers = {
     BlogController: Object.assign(BlogController, BlogController),
     ContactController: Object.assign(ContactController, ContactController),
     StripeWebhookController: Object.assign(StripeWebhookController, StripeWebhookController),
+    PrintifyWebhookController: Object.assign(PrintifyWebhookController, PrintifyWebhookController),
     AccountOrderController: Object.assign(AccountOrderController, AccountOrderController),
     Settings: Object.assign(Settings, Settings),
 }

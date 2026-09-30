@@ -47,4 +47,11 @@ return [
         'order_notification_email' => env('ORDER_ADMIN_EMAIL') ?: env('MAIL_FROM_ADDRESS'),
     ],
 
+    'printify' => [
+        'token' => env('PRINTIFY_API_TOKEN'),
+        'shop_id' => env('PRINTIFY_SHOP_ID'),
+        'webhook_secret' => env('PRINTIFY_WEBHOOK_SECRET'),
+        'base_url' => env('PRINTIFY_BASE_URL', 'https://api.printify.com/v1'),
+    ],
+
 ];
