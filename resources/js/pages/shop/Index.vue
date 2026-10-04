@@ -71,31 +71,31 @@ const activeName = props.categories.find((c) => c.slug === props.activeCategory)
                 <p class="mb-6 text-sm text-neutral-500">{{ products.length }} product{{ products.length === 1 ? '' : 's' }}</p>
 
                 <div v-if="products.length" class="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
-                    <div v-for="p in products" :key="p.id" class="group">
+                    <div v-for="p in products" :key="p.id" class="group flex flex-col">
                         <Link :href="`/shop/${p.slug}`" class="relative mb-4 flex aspect-square items-center justify-center overflow-hidden rounded-md bg-neutral-100">
                             <img v-if="p.image" :src="p.image" :alt="p.name" class="h-full w-full object-cover" />
                             <span v-else class="grid h-24 w-24 place-items-center rounded-full border-2 border-neutral-300 font-display text-xl text-neutral-400">D2GB</span>
                             <span v-if="p.compare_at_price" class="absolute left-3 top-3 bg-d2gb-gold px-2 py-1 font-heading text-[10px] font-bold uppercase text-black">Sale</span>
                         </Link>
-                        <Link :href="`/shop/${p.slug}`" class="font-heading text-sm font-semibold uppercase transition hover:text-d2gb-gold">{{ p.name }}</Link>
-                        <p class="mt-1 flex items-center gap-2">
+                        <Link :href="`/shop/${p.slug}`" :title="p.name" class="line-clamp-2 min-h-[2lh] font-heading text-sm font-semibold uppercase transition hover:text-d2gb-gold">{{ p.name }}</Link>
+                        <p class="mt-1 mb-3 flex items-center gap-2">
                             <span class="font-display text-lg">{{ money(p.price) }}</span>
                             <span v-if="p.compare_at_price" class="text-sm text-neutral-400 line-through">{{ money(p.compare_at_price) }}</span>
                         </p>
-                        <span v-if="!p.in_stock" class="mt-3 flex w-full items-center justify-center gap-2 bg-neutral-200 py-3 font-heading text-xs font-bold uppercase tracking-wider text-neutral-500">
+                        <span v-if="!p.in_stock" class="mt-auto flex w-full items-center justify-center gap-2 bg-neutral-200 py-3 font-heading text-xs font-bold uppercase tracking-wider text-neutral-500">
                             Out of Stock
                         </span>
                         <Link
                             v-else-if="p.has_sizes"
                             :href="`/shop/${p.slug}`"
-                            class="mt-3 flex w-full items-center justify-center gap-2 bg-neutral-900 py-3 font-heading text-xs font-bold uppercase tracking-wider text-white transition hover:bg-d2gb-gold hover:text-black"
+                            class="mt-auto flex w-full items-center justify-center gap-2 bg-neutral-900 py-3 font-heading text-xs font-bold uppercase tracking-wider text-white transition hover:bg-d2gb-gold hover:text-black"
                         >
                             Select Options
                         </Link>
                         <button
                             v-else
                             @click="addToCart(p)"
-                            class="mt-3 flex w-full items-center justify-center gap-2 bg-neutral-900 py-3 font-heading text-xs font-bold uppercase tracking-wider text-white transition hover:bg-d2gb-gold hover:text-black"
+                            class="mt-auto flex w-full items-center justify-center gap-2 bg-neutral-900 py-3 font-heading text-xs font-bold uppercase tracking-wider text-white transition hover:bg-d2gb-gold hover:text-black"
                         >
                             Add To Cart <ShoppingCart class="h-4 w-4" />
                         </button>
