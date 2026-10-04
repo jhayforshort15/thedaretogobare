@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use App\Filament\Resources\Orders\PrintifyActions;
+use App\Models\Order;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\ViewAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -53,12 +56,29 @@ class OrdersTable
                         default => 'danger',
                     })
                     ->sortable(),
+                TextColumn::make('printify_status')
+                    ->label('Printify')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state) => Order::PRINTIFY_STATUSES[$state] ?? $state)
+                    ->color(fn (?string $state): string => match (true) {
+                        in_array($state, Order::PRINTIFY_PROBLEM_STATUSES, true) => 'danger',
+                        $state === 'on-hold' => 'warning',
+                        in_array($state, ['fulfilled', 'delivered'], true) => 'success',
+                        default => 'info',
+                    })
+                    ->tooltip(fn ($record) => $record->printify_error)
+                    ->placeholder('—'),
                 TextColumn::make('created_at')
                     ->label('Placed')
                     ->dateTime('M j, Y g:i A')
                     ->sortable(),
             ])
             ->filters([
+                Filter::make('printify_attention')
+                    ->label('Printify needs attention')
+                    ->query(fn ($query) => $query->where(fn ($q) => $q
+                        ->whereIn('printify_status', [...Order::PRINTIFY_PROBLEM_STATUSES, 'on-hold'])
+                        ->orWhereNotNull('printify_error'))),
                 SelectFilter::make('status')
                     ->options([
                         'pending' => 'Pending',
@@ -76,6 +96,8 @@ class OrdersTable
                     ]),
             ])
             ->recordActions([
+                PrintifyActions::retry()->iconButton(),
+                PrintifyActions::sendToProduction()->iconButton(),
                 ViewAction::make(),
                 EditAction::make(),
             ])

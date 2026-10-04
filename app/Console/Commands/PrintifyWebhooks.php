@@ -12,12 +12,14 @@ class PrintifyWebhooks extends Command
                             {--list : Only list registered webhooks}
                             {--shops : List shops available to the API token}';
 
-    protected $description = 'Register the Printify product and shipment webhooks for this site';
+    protected $description = 'Register the Printify product and order webhooks for this site';
 
     // Topics handled by PrintifyWebhookController.
     protected const TOPICS = [
         'product:publish:started',
         'product:deleted',
+        'order:updated',
+        'order:sent-to-production',
         'order:shipment:created',
         'order:shipment:delivered',
     ];

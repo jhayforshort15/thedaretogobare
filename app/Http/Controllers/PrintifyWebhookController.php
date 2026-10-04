@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\PrintifyFulfillment;
 use App\Services\PrintifyProductImporter;
 use App\Services\PrintifyService;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ use Throwable;
 
 class PrintifyWebhookController extends Controller
 {
-    public function handle(Request $request, PrintifyService $printify, PrintifyProductImporter $importer): Response
+    public function handle(Request $request, PrintifyService $printify, PrintifyProductImporter $importer, PrintifyFulfillment $fulfillment): Response
     {
         $secret = config('services.printify.webhook_secret');
         $payload = $request->getContent();
@@ -37,7 +38,9 @@ class PrintifyWebhookController extends Controller
         match ($type) {
             'product:publish:started' => $this->publishProduct($resource['id'] ?? null, $printify, $importer),
             'product:deleted' => $this->unpublishProduct($resource['id'] ?? null),
-            'order:shipment:created', 'order:shipment:delivered' => $this->updateShipment($type, $resource),
+            'order:updated' => $this->updateOrderStatus($resource, $resource['data']['status'] ?? null, $fulfillment),
+            'order:sent-to-production' => $this->updateOrderStatus($resource, 'in-production', $fulfillment),
+            'order:shipment:created', 'order:shipment:delivered' => $this->updateShipment($type, $resource, $fulfillment),
             default => null,
         };
 
@@ -80,18 +83,43 @@ class PrintifyWebhookController extends Controller
         }
     }
 
-    protected function updateShipment(string $type, array $resource): void
+    /**
+     * Match the order by the Printify order id or our external_id.
+     */
+    protected function findOrder(array $resource): ?Order
+    {
+        $printifyId = $resource['id'] ?? null;
+        $externalId = $resource['data']['external_id'] ?? null;
+
+        if (! $printifyId && ! $externalId) {
+            return null;
+        }
+
+        return Order::query()
+            ->when($printifyId, fn ($q) => $q->where('printify_order_id', $printifyId))
+            ->when($externalId, fn ($q) => $q->orWhere('order_number', $externalId))
+            ->first();
+    }
+
+    protected function updateOrderStatus(array $resource, ?string $status, PrintifyFulfillment $fulfillment): void
+    {
+        $order = $this->findOrder($resource);
+
+        if ($order && $status) {
+            $fulfillment->recordStatus($order, $status);
+        }
+    }
+
+    protected function updateShipment(string $type, array $resource, PrintifyFulfillment $fulfillment): void
     {
         $data = $resource['data'] ?? [];
-
-        // Match the order by the Printify order id or our external_id.
-        $order = Order::where('printify_order_id', $resource['id'] ?? null)
-            ->orWhere('order_number', $data['external_id'] ?? null)
-            ->first();
+        $order = $this->findOrder($resource);
 
         if (! $order) {
             return;
         }
+
+        $fulfillment->recordStatus($order, $type === 'order:shipment:delivered' ? 'delivered' : 'fulfilled');
 
         $shipment = $data['shipments'][0] ?? $data;
 

@@ -52,6 +52,8 @@ return [
         'shop_id' => env('PRINTIFY_SHOP_ID'),
         'webhook_secret' => env('PRINTIFY_WEBHOOK_SECRET'),
         'base_url' => env('PRINTIFY_BASE_URL', 'https://api.printify.com/v1'),
+        // Send paid orders straight to print. false = they wait "On hold" for an admin to approve.
+        'auto_production' => env('PRINTIFY_AUTO_PRODUCTION', true),
     ],
 
 ];

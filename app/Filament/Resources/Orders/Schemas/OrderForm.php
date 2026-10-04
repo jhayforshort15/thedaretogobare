@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
+use App\Models\Order;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -35,6 +36,23 @@ class OrderForm
                                 'paid' => 'Paid',
                                 'refunded' => 'Refunded',
                             ]),
+                    ]),
+
+                Section::make('Printify fulfilment')
+                    ->columns(2)
+                    ->visible(fn ($record) => $record?->printify_order_id || $record?->printify_status || $record?->printify_error)
+                    ->schema([
+                        TextInput::make('printify_order_id')->label('Printify order ID')->disabled(),
+                        Select::make('printify_status')->label('Printify status')->options(Order::PRINTIFY_STATUSES)->disabled(),
+                        Textarea::make('printify_error')->label('Last problem')->disabled()->columnSpanFull()
+                            ->visible(fn ($record) => filled($record?->printify_error)),
+                    ]),
+
+                Section::make('Tracking')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('tracking_number')->maxLength(255),
+                        TextInput::make('tracking_url')->label('Tracking link')->url()->maxLength(255),
                     ]),
 
                 Section::make('Customer')

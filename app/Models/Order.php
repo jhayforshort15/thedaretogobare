@@ -17,8 +17,24 @@ class Order extends Model
         'shipping_address', 'shipping_city', 'shipping_state', 'shipping_postal_code', 'shipping_country',
         'subtotal', 'shipping_cost', 'tax', 'total',
         'status', 'payment_status', 'payment_method', 'payment_reference', 'notes',
-        'printify_order_id', 'tracking_number', 'tracking_url',
+        'printify_order_id', 'printify_status', 'printify_error', 'tracking_number', 'tracking_url',
     ];
+
+    /** Printify fulfilment states we track (our own, plus Printify's order statuses). */
+    public const PRINTIFY_STATUSES = [
+        'failed' => 'Failed to send',
+        'on-hold' => 'On hold',
+        'sending-to-production' => 'Sending to production',
+        'in-production' => 'In production',
+        'has-issues' => 'Has issues',
+        'canceled' => 'Canceled',
+        'partially-fulfilled' => 'Partially shipped',
+        'fulfilled' => 'Shipped',
+        'delivered' => 'Delivered',
+    ];
+
+    /** States that need someone to look at the order. */
+    public const PRINTIFY_PROBLEM_STATUSES = ['failed', 'has-issues', 'canceled'];
 
     protected $casts = [
         'subtotal' => 'decimal:2',

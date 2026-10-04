@@ -118,6 +118,14 @@ class PrintifyService
     }
 
     /**
+     * Approve an on-hold order for printing.
+     */
+    public function sendToProduction(string $printifyOrderId): void
+    {
+        $this->client()->post("/shops/{$this->shopId()}/orders/{$printifyOrderId}/send_to_production.json")->throw();
+    }
+
+    /**
      * Fetch a single product from the connected shop.
      */
     public function product(string $productId): array
