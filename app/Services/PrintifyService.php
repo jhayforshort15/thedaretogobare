@@ -113,4 +113,69 @@ class PrintifyService
 
         return $response->json('id');
     }
+
+    /**
+     * Fetch a single product from the connected shop.
+     */
+    public function product(string $productId): array
+    {
+        return $this->client()->get("/shops/{$this->shopId()}/products/{$productId}.json")->throw()->json();
+    }
+
+    /**
+     * Tell Printify the product is live on our site (clears its "Publishing" state).
+     */
+    public function publishingSucceeded(string $productId, string $externalId, string $handle): void
+    {
+        $this->client()->post("/shops/{$this->shopId()}/products/{$productId}/publishing_succeeded.json", [
+            'external' => ['id' => $externalId, 'handle' => $handle],
+        ])->throw();
+    }
+
+    public function publishingFailed(string $productId, string $reason): void
+    {
+        $this->client()->post("/shops/{$this->shopId()}/products/{$productId}/publishing_failed.json", [
+            'reason' => $reason,
+        ])->throw();
+    }
+
+    /**
+     * List shops available to the API token.
+     */
+    public function shops(): array
+    {
+        return $this->client()->get('/shops.json')->throw()->json();
+    }
+
+    /**
+     * List webhooks registered for the connected shop.
+     */
+    public function webhooks(): array
+    {
+        return $this->client()->get("/shops/{$this->shopId()}/webhooks.json")->throw()->json();
+    }
+
+    /**
+     * Register a webhook for the given topic.
+     */
+    public function createWebhook(string $topic, string $url, ?string $secret = null): array
+    {
+        $payload = array_filter([
+            'topic' => $topic,
+            'url' => $url,
+            'secret' => $secret,
+        ]);
+
+        return $this->client()->post("/shops/{$this->shopId()}/webhooks.json", $payload)->throw()->json();
+    }
+
+    /**
+     * Delete a webhook. Printify requires the host of the webhook URL.
+     */
+    public function deleteWebhook(string $webhookId, string $url): void
+    {
+        $host = urlencode((string) parse_url($url, PHP_URL_HOST));
+
+        $this->client()->delete("/shops/{$this->shopId()}/webhooks/{$webhookId}.json?host={$host}")->throw();
+    }
 }
