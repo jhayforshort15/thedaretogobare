@@ -64,13 +64,16 @@ class PrintifyService
      */
     public function submitOrder(Order $order): ?string
     {
-        $order->loadMissing('items.product', 'items');
+        $order->loadMissing('items.product', 'items.variant');
 
         $lineItems = [];
         foreach ($order->items as $item) {
-            $variantId = $item->product?->variants()
-                ->where('size', $item->size)
-                ->value('printify_variant_id');
+            // Prefer the exact variant chosen; fall back to matching size + colour.
+            $variantId = $item->variant?->printify_variant_id
+                ?? $item->product?->variants()
+                    ->where('size', $item->size)
+                    ->where('color', $item->color)
+                    ->value('printify_variant_id');
 
             $printifyProductId = $item->product?->printify_product_id;
 

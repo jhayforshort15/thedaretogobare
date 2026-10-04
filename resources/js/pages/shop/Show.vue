@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import { ShoppingCart, Minus, Plus, ShieldCheck, Truck, RefreshCw } from '@lucide/vue';
 import StoreHeader from '@/components/store/StoreHeader.vue';
@@ -16,20 +16,49 @@ interface Product {
     category: { name: string; slug: string } | null;
     brand: { name: string; slug: string } | null;
     sizes: string[];
+    colors: { name: string; hex: string | null }[];
+    variants: { size: string | null; color: string | null; price: number; image: string | null; in_stock: boolean }[];
     images: { path: string; alt: string | null }[];
 }
 
 const props = defineProps<{ product: Product; related: Related[] }>();
 
-const selectedSize = ref<string | null>(props.product.sizes.length ? props.product.sizes[0] : null);
+const selectedColor = ref<string | null>(props.product.colors[0]?.name ?? null);
 const quantity = ref(1);
 const money = (n: number) => `$${n.toFixed(2)}`;
-const inStock = computed(() => props.product.stock > 0);
+
+// Sizes offered in the chosen colour (all sizes when the product has no colours).
+const sizesForColor = computed(() => {
+    if (!props.product.colors.length) return props.product.sizes;
+    const available = new Set(props.product.variants.filter((v) => v.color === selectedColor.value).map((v) => v.size));
+    return props.product.sizes.filter((size) => available.has(size));
+});
+
+const selectedSize = ref<string | null>(sizesForColor.value[0] ?? null);
+
+// Keep the size valid when switching to a colour that doesn't offer it.
+watch(sizesForColor, (sizes) => {
+    if (selectedSize.value && !sizes.includes(selectedSize.value)) selectedSize.value = sizes[0] ?? null;
+});
+
+const currentVariant = computed(() =>
+    props.product.variants.find((v) => v.size === selectedSize.value && v.color === selectedColor.value) ?? null,
+);
+const price = computed(() => currentVariant.value?.price ?? props.product.price);
+const inStock = computed(() => props.product.stock > 0 && (currentVariant.value?.in_stock ?? true));
+
+// Main photo: follows the chosen colour, or a clicked thumbnail.
+const activeImage = ref<string | null>(props.product.image);
+watch(selectedColor, (color) => {
+    const image = props.product.variants.find((v) => v.color === color && v.image)?.image;
+    if (image) activeImage.value = image;
+}, { immediate: true });
 
 function addToCart() {
     router.post('/cart', {
         product_id: props.product.id,
         size: selectedSize.value,
+        color: selectedColor.value,
         quantity: quantity.value,
     }, {
         preserveScroll: true,
@@ -66,13 +95,19 @@ function addToCart() {
                 <!-- Gallery -->
                 <div>
                     <div class="flex aspect-square items-center justify-center overflow-hidden rounded-md bg-neutral-100">
-                        <img v-if="product.image" :src="product.image" :alt="product.name" class="h-full w-full object-cover" />
+                        <img v-if="activeImage" :src="activeImage" :alt="product.name" class="h-full w-full object-cover" />
                         <span v-else class="grid h-40 w-40 place-items-center rounded-full border-4 border-neutral-300 font-display text-3xl text-neutral-400">D2GB</span>
                     </div>
                     <div v-if="product.images.length" class="mt-4 grid grid-cols-4 gap-3">
-                        <div v-for="(img, i) in product.images" :key="i" class="aspect-square overflow-hidden rounded bg-neutral-100">
+                        <button
+                            v-for="(img, i) in product.images"
+                            :key="i"
+                            type="button"
+                            @click="activeImage = img.path"
+                            :class="['aspect-square overflow-hidden rounded bg-neutral-100 ring-2 transition', activeImage === img.path ? 'ring-neutral-900' : 'ring-transparent hover:ring-neutral-300']"
+                        >
                             <img :src="img.path" :alt="img.alt ?? product.name" class="h-full w-full object-cover" />
-                        </div>
+                        </button>
                     </div>
                 </div>
 
@@ -82,18 +117,46 @@ function addToCart() {
                     <h1 class="mt-1 font-display text-4xl uppercase leading-tight md:text-5xl">{{ product.name }}</h1>
 
                     <div class="mt-4 flex items-center gap-3">
-                        <span class="font-display text-3xl">{{ money(product.price) }}</span>
+                        <span class="font-display text-3xl">{{ money(price) }}</span>
                         <span v-if="product.compare_at_price" class="text-lg text-neutral-400 line-through">{{ money(product.compare_at_price) }}</span>
                     </div>
 
                     <p v-if="product.short_description" class="mt-4 text-sm leading-relaxed text-neutral-600">{{ product.short_description }}</p>
 
+                    <!-- Color picker -->
+                    <div v-if="product.colors.length" class="mt-6">
+                        <p class="mb-2 font-heading text-xs font-bold uppercase tracking-wide">
+                            Color: <span class="font-normal normal-case text-neutral-600">{{ selectedColor }}</span>
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                v-for="color in product.colors"
+                                :key="color.name"
+                                type="button"
+                                @click="selectedColor = color.name"
+                                :title="color.name"
+                                :aria-label="color.name"
+                                :aria-pressed="selectedColor === color.name"
+                                :class="[
+                                    'transition',
+                                    color.hex ? 'h-9 w-9 rounded-full border border-neutral-300 ring-2 ring-offset-2' : 'border px-3 py-2 font-heading text-xs font-semibold uppercase',
+                                    selectedColor === color.name
+                                        ? (color.hex ? 'ring-neutral-900' : 'border-neutral-900 bg-neutral-900 text-white')
+                                        : (color.hex ? 'ring-transparent hover:ring-neutral-300' : 'border-neutral-300 hover:border-neutral-900'),
+                                ]"
+                                :style="color.hex ? { backgroundColor: color.hex } : undefined"
+                            >
+                                <template v-if="!color.hex">{{ color.name }}</template>
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Size picker -->
-                    <div v-if="product.sizes.length" class="mt-6">
+                    <div v-if="sizesForColor.length" class="mt-6">
                         <p class="mb-2 font-heading text-xs font-bold uppercase tracking-wide">Size</p>
                         <div class="flex flex-wrap gap-2">
                             <button
-                                v-for="size in product.sizes"
+                                v-for="size in sizesForColor"
                                 :key="size"
                                 @click="selectedSize = size"
                                 :class="[
@@ -128,7 +191,8 @@ function addToCart() {
                         :product-id="product.id"
                         :quantity="quantity"
                         :size="selectedSize"
-                        :unit-price="product.price"
+                        :color="selectedColor"
+                        :unit-price="price"
                     />
 
                     <p class="mt-3 text-xs uppercase tracking-wide" :class="inStock ? 'text-green-600' : 'text-red-500'">

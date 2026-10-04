@@ -62,17 +62,37 @@ class Product extends Model
     }
 
     /**
-     * Reduce stock for this product (and the matching size variant) after a sale.
+     * Find the variant matching the customer's size/colour choice.
+     * Returns an error message instead when the choice is incomplete or doesn't exist.
      */
-    public function decrementStock(?string $size, int $quantity): void
+    public function resolveVariant(?string $size, ?string $color): ProductVariant|string|null
+    {
+        $variants = $this->variants;
+
+        if ($variants->isEmpty()) {
+            return null;
+        }
+
+        if ($variants->whereNotNull('color')->isNotEmpty() && empty($color)) {
+            return 'Please choose a color first.';
+        }
+
+        if ($variants->whereNotNull('size')->isNotEmpty() && empty($size)) {
+            return 'Please choose a size first.';
+        }
+
+        return $variants->first(fn (ProductVariant $v) => $v->size == $size && $v->color == $color)
+            ?? 'That size and color combination is not available.';
+    }
+
+    /**
+     * Reduce stock for this product (and the chosen variant) after a sale.
+     */
+    public function decrementStock(?ProductVariant $variant, int $quantity): void
     {
         $this->decrement('stock', min($quantity, $this->stock));
 
-        if ($size) {
-            $this->variants()->where('size', $size)->each(
-                fn (ProductVariant $variant) => $variant->decrement('stock', min($quantity, $variant->stock)),
-            );
-        }
+        $variant?->decrement('stock', min($quantity, $variant->stock));
     }
 
     public function images(): HasMany

@@ -12,6 +12,7 @@ interface CartItem {
     slug: string;
     image: string | null;
     size: string | null;
+    color: string | null;
     price: number;
     quantity: number;
     subtotal: number;
@@ -76,7 +77,7 @@ const SHIPPING_THRESHOLD = 150;
                                 <div class="flex justify-between gap-2">
                                     <div>
                                         <Link :href="`/shop/${item.slug}`" class="font-heading text-sm font-semibold uppercase hover:text-d2gb-gold">{{ item.name }}</Link>
-                                        <p v-if="item.size" class="mt-0.5 text-xs uppercase tracking-wide text-neutral-500">Size: {{ item.size }}</p>
+                                        <p v-if="item.size || item.color" class="mt-0.5 text-xs uppercase tracking-wide text-neutral-500">{{ [item.size && `Size: ${item.size}`, item.color].filter(Boolean).join(' · ') }}</p>
                                         <p class="mt-0.5 text-xs text-neutral-500">{{ money(item.price) }} each</p>
                                     </div>
                                     <button @click="remove(item)" class="self-start text-neutral-400 transition hover:text-red-500" aria-label="Remove"><Trash2 class="h-4 w-4" /></button>

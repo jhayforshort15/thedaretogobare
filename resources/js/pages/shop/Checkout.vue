@@ -3,7 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import StoreHeader from '@/components/store/StoreHeader.vue';
 import StoreFooter from '@/components/store/StoreFooter.vue';
 
-interface Item { row_id: string; name: string; slug: string; image: string | null; size: string | null; price: number; quantity: number; subtotal: number }
+interface Item { row_id: string; name: string; slug: string; image: string | null; size: string | null; color: string | null; price: number; quantity: number; subtotal: number }
 interface Summary { subtotal: number; shipping: number; tax: number; total: number; free_shipping_threshold: number }
 interface Prefill { email: string; first_name: string; last_name: string }
 
@@ -118,7 +118,7 @@ const submit = () => form.post('/checkout');
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <p class="truncate text-sm font-semibold">{{ item.name }}</p>
-                                    <p v-if="item.size" class="text-xs text-neutral-500">Size: {{ item.size }}</p>
+                                    <p v-if="item.size || item.color" class="text-xs text-neutral-500">{{ [item.size && `Size: ${item.size}`, item.color].filter(Boolean).join(' · ') }}</p>
                                 </div>
                                 <span class="text-sm font-semibold">{{ money(item.subtotal) }}</span>
                             </li>

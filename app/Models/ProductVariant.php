@@ -9,7 +9,7 @@ class ProductVariant extends Model
 {
     protected $fillable = [
         'printify_variant_id',
-        'product_id', 'size', 'color', 'sku', 'price_override', 'stock',
+        'product_id', 'size', 'color', 'color_hex', 'image', 'sku', 'price_override', 'stock',
     ];
 
     protected $casts = [
@@ -19,5 +19,13 @@ class ProductVariant extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Selling price for this variant — its override, else the product price.
+     */
+    public function priceFor(Product $product): float
+    {
+        return (float) ($this->price_override ?? $product->price);
     }
 }

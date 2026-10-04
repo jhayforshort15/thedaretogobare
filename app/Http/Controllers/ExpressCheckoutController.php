@@ -15,9 +15,7 @@ use Illuminate\Support\Str;
 
 class ExpressCheckoutController extends Controller
 {
-    public function __construct(protected StripeService $stripe, protected OrderNotifier $notifier)
-    {
-    }
+    public function __construct(protected StripeService $stripe, protected OrderNotifier $notifier) {}
 
     /**
      * Create a pending order + PaymentIntent for a single-product express purchase.
@@ -32,6 +30,7 @@ class ExpressCheckoutController extends Controller
         $data = $request->validate([
             'product_id' => ['required', 'exists:products,id'],
             'size' => ['nullable', 'string', 'max:50'],
+            'color' => ['nullable', 'string', 'max:50'],
             'quantity' => ['required', 'integer', 'min:1', 'max:99'],
             'email' => ['required', 'email', 'max:255'],
             'first_name' => ['required', 'string', 'max:255'],
@@ -46,16 +45,22 @@ class ExpressCheckoutController extends Controller
 
         $product = Product::where('is_active', true)->findOrFail($data['product_id']);
 
+        $variant = $product->resolveVariant($data['size'] ?? null, $data['color'] ?? null);
+        if (is_string($variant)) {
+            return response()->json(['message' => $variant], 422);
+        }
+
         if ($product->stock < $data['quantity']) {
             return response()->json(['message' => "Only {$product->stock} left in stock."], 422);
         }
 
-        $subtotal = round((float) $product->price * $data['quantity'], 2);
+        $unitPrice = $variant ? $variant->priceFor($product) : (float) $product->price;
+        $subtotal = round($unitPrice * $data['quantity'], 2);
         $shipping = $subtotal >= CartService::FREE_SHIPPING_THRESHOLD ? 0.0 : CartService::FLAT_SHIPPING;
         $total = round($subtotal + $shipping, 2);
 
         try {
-            [$order, $clientSecret] = DB::transaction(function () use ($data, $product, $subtotal, $shipping, $total, $request) {
+            [$order, $clientSecret] = DB::transaction(function () use ($data, $product, $variant, $unitPrice, $subtotal, $shipping, $total, $request) {
                 $order = Order::create([
                     'order_number' => 'D2GB-'.strtoupper(Str::random(8)),
                     'user_id' => $request->user()?->id,
@@ -79,14 +84,16 @@ class ExpressCheckoutController extends Controller
 
                 $order->items()->create([
                     'product_id' => $product->id,
+                    'product_variant_id' => $variant?->id,
                     'name' => $product->name,
-                    'size' => $data['size'] ?? null,
-                    'price' => (float) $product->price,
+                    'size' => $variant?->size,
+                    'color' => $variant?->color,
+                    'price' => $unitPrice,
                     'quantity' => $data['quantity'],
                     'subtotal' => $subtotal,
                 ]);
 
-                $product->decrementStock($data['size'] ?? null, $data['quantity']);
+                $product->decrementStock($variant, $data['quantity']);
 
                 $intent = $this->stripe->createPaymentIntent($order);
                 $order->update(['payment_reference' => $intent->id]);

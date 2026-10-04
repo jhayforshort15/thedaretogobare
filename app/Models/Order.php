@@ -69,6 +69,7 @@ class Order extends Model
             'items' => $this->items->map(fn (OrderItem $i) => [
                 'name' => $i->name,
                 'size' => $i->size,
+                'color' => $i->color,
                 'price' => (float) $i->price,
                 'quantity' => $i->quantity,
                 'subtotal' => (float) $i->subtotal,

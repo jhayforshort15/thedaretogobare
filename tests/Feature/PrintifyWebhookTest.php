@@ -42,9 +42,9 @@ class PrintifyWebhookTest extends TestCase
                 'visible' => true,
                 'images' => [['src' => 'https://images.printify.com/tee.png', 'is_default' => true]],
                 'variants' => [
-                    ['id' => 1, 'title' => 'S / Black', 'price' => 2500, 'is_enabled' => true, 'sku' => 'T-S'],
-                    ['id' => 2, 'title' => 'M / Black', 'price' => 2700, 'is_enabled' => true, 'sku' => 'T-M'],
-                    ['id' => 3, 'title' => 'L / Black', 'price' => 2700, 'is_enabled' => false],
+                    ['id' => 1, 'title' => 'Black / S', 'price' => 2500, 'is_enabled' => true, 'sku' => 'T-S'],
+                    ['id' => 2, 'title' => 'Black / M', 'price' => 2700, 'is_enabled' => true, 'sku' => 'T-M'],
+                    ['id' => 3, 'title' => 'Black / L', 'price' => 2700, 'is_enabled' => false],
                 ],
             ]),
             '*/publishing_succeeded.json' => Http::response([], 200),

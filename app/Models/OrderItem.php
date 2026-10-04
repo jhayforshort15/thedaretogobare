@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OrderItem extends Model
 {
     protected $fillable = [
-        'order_id', 'product_id', 'name', 'size', 'price', 'quantity', 'subtotal',
+        'order_id', 'product_id', 'product_variant_id', 'name', 'size', 'color', 'price', 'quantity', 'subtotal',
     ];
 
     protected $casts = [
@@ -24,5 +24,23 @@ class OrderItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+    }
+
+    /**
+     * "Size M, Black" style label for receipts and emails.
+     */
+    public function optionsLabel(): ?string
+    {
+        $parts = array_filter([
+            $this->size ? "Size {$this->size}" : null,
+            $this->color,
+        ]);
+
+        return $parts ? implode(', ', $parts) : null;
     }
 }

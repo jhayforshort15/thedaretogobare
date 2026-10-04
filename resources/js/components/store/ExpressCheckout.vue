@@ -6,6 +6,7 @@ const props = defineProps<{
     productId: number;
     quantity: number;
     size: string | null;
+    color: string | null;
     unitPrice: number;
 }>();
 
@@ -60,9 +61,9 @@ onMounted(async () => {
         const expressCheckout = elements.create('expressCheckout');
         expressCheckout.mount(container.value);
 
-        // Keep the amount in sync if the customer changes quantity.
+        // Keep the amount in sync if the customer changes quantity or variant price.
         watch(
-            () => props.quantity,
+            () => [props.quantity, props.unitPrice],
             () => elements.update({ amount: totalCents() }),
         );
 
@@ -113,6 +114,7 @@ onMounted(async () => {
                     body: JSON.stringify({
                         product_id: props.productId,
                         size: props.size,
+                        color: props.color,
                         quantity: props.quantity,
                         email: billing.email ?? '',
                         first_name: firstName || 'Customer',

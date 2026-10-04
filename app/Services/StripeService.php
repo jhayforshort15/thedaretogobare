@@ -35,7 +35,7 @@ class StripeService
                 'currency' => $currency,
                 'unit_amount' => (int) round(((float) $item->price) * 100),
                 'product_data' => [
-                    'name' => $item->name.($item->size ? " (Size {$item->size})" : ''),
+                    'name' => $item->name.($item->optionsLabel() ? " ({$item->optionsLabel()})" : ''),
                 ],
             ],
         ])->all();

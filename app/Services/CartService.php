@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Support\Collection;
 
 class CartService
@@ -10,9 +11,9 @@ class CartService
     protected string $sessionKey = 'cart';
 
     /**
-     * Raw session lines: [ rowId => ['product_id' => int, 'size' => ?string, 'quantity' => int] ]
+     * Raw session lines: [ rowId => ['product_id' => int, 'variant_id' => ?int, 'size' => ?string, 'color' => ?string, 'quantity' => int] ]
      *
-     * @return array<string, array{product_id:int, size:?string, quantity:int}>
+     * @return array<string, array{product_id:int, variant_id:?int, size:?string, color:?string, quantity:int}>
      */
     protected function lines(): array
     {
@@ -24,23 +25,25 @@ class CartService
         session()->put($this->sessionKey, $lines);
     }
 
-    protected function rowId(int $productId, ?string $size): string
+    public function rowId(int $productId, ?ProductVariant $variant): string
     {
-        return $productId.'-'.($size ?: 'default');
+        return $productId.'-'.($variant?->id ?? 'default');
     }
 
-    public function add(Product $product, ?string $size, int $quantity = 1): void
+    public function add(Product $product, ?ProductVariant $variant, int $quantity = 1): void
     {
         $quantity = max(1, $quantity);
         $lines = $this->lines();
-        $rowId = $this->rowId($product->id, $size);
+        $rowId = $this->rowId($product->id, $variant);
 
         if (isset($lines[$rowId])) {
             $lines[$rowId]['quantity'] += $quantity;
         } else {
             $lines[$rowId] = [
                 'product_id' => $product->id,
-                'size' => $size,
+                'variant_id' => $variant?->id,
+                'size' => $variant?->size,
+                'color' => $variant?->color,
                 'quantity' => $quantity,
             ];
         }
@@ -89,24 +92,28 @@ class CartService
         }
 
         $products = Product::whereIn('id', collect($lines)->pluck('product_id'))->get()->keyBy('id');
+        $variants = ProductVariant::whereIn('id', collect($lines)->pluck('variant_id')->filter())->get()->keyBy('id');
 
         return collect($lines)
-            ->map(function (array $line, string $rowId) use ($products) {
+            ->map(function (array $line, string $rowId) use ($products, $variants) {
                 $product = $products->get($line['product_id']);
 
                 if (! $product) {
                     return null;
                 }
 
-                $price = (float) $product->price;
+                $variant = $variants->get($line['variant_id'] ?? null);
+                $price = $variant ? $variant->priceFor($product) : (float) $product->price;
 
                 return [
                     'row_id' => $rowId,
                     'product_id' => $product->id,
+                    'variant_id' => $variant?->id,
                     'name' => $product->name,
                     'slug' => $product->slug,
-                    'image' => $product->image_url,
-                    'size' => $line['size'],
+                    'image' => $variant?->image ?: $product->image_url,
+                    'size' => $variant?->size ?? $line['size'] ?? null,
+                    'color' => $variant?->color ?? $line['color'] ?? null,
                     'price' => $price,
                     'quantity' => $line['quantity'],
                     'subtotal' => round($price * $line['quantity'], 2),

@@ -14,7 +14,7 @@ Placed {{ $order->created_at?->format('M j, Y') }}
 | Item | Qty | Price |
 |:-----|:---:|------:|
 @foreach ($order->items as $item)
-| {{ $item->name }}{{ $item->size ? ' (Size ' . $item->size . ')' : '' }} | {{ $item->quantity }} | {{ $money($item->price) }} |
+| {{ $item->name }}{{ $item->optionsLabel() ? ' (' . $item->optionsLabel() . ')' : '' }} | {{ $item->quantity }} | {{ $money($item->price) }} |
 @endforeach
 </x-mail::table>
 

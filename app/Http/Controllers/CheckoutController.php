@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\CartService;
 use App\Services\OrderNotifier;
 use App\Services\StripeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -20,8 +23,7 @@ class CheckoutController extends Controller
         protected CartService $cart,
         protected StripeService $stripe,
         protected OrderNotifier $notifier,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): Response|RedirectResponse
     {
@@ -90,14 +92,17 @@ class CheckoutController extends Controller
             foreach ($items as $item) {
                 $order->items()->create([
                     'product_id' => $item['product_id'],
+                    'product_variant_id' => $item['variant_id'],
                     'name' => $item['name'],
                     'size' => $item['size'],
+                    'color' => $item['color'],
                     'price' => $item['price'],
                     'quantity' => $item['quantity'],
                     'subtotal' => $item['subtotal'],
                 ]);
 
-                Product::find($item['product_id'])?->decrementStock($item['size'], $item['quantity']);
+                $variant = $item['variant_id'] ? ProductVariant::find($item['variant_id']) : null;
+                Product::find($item['product_id'])?->decrementStock($variant, $item['quantity']);
             }
 
             return $order;
@@ -133,7 +138,7 @@ class CheckoutController extends Controller
     /**
      * Returns an error message if any cart item exceeds available stock, else null.
      */
-    protected function checkStock(\Illuminate\Support\Collection $items): ?string
+    protected function checkStock(Collection $items): ?string
     {
         $products = Product::whereIn('id', $items->pluck('product_id'))->get()->keyBy('id');
 
@@ -199,6 +204,7 @@ class CheckoutController extends Controller
                 'items' => $order->items->map(fn ($i) => [
                     'name' => $i->name,
                     'size' => $i->size,
+                    'color' => $i->color,
                     'price' => (float) $i->price,
                     'quantity' => $i->quantity,
                     'subtotal' => (float) $i->subtotal,

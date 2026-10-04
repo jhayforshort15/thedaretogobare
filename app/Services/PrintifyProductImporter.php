@@ -49,8 +49,10 @@ class PrintifyProductImporter
             ->whereNotIn('printify_variant_id', $enabledVariants->pluck('id'))
             ->delete();
 
+        $options = $this->optionLookup($p['options'] ?? []);
+
         foreach ($enabledVariants as $v) {
-            [$size, $color] = $this->parseTitle($v['title'] ?? '');
+            ['size' => $size, 'color' => $color, 'color_hex' => $colorHex] = $this->variantOptions($v, $options);
             $price = ($v['price'] ?? 0) / 100;
 
             $product->variants()->updateOrCreate(
@@ -58,6 +60,8 @@ class PrintifyProductImporter
                 [
                     'size' => $size,
                     'color' => $color,
+                    'color_hex' => $colorHex,
+                    'image' => $this->variantImage($p['images'] ?? [], $v['id']),
                     'sku' => $v['sku'] ?? null,
                     'price_override' => $price != $basePrice ? $price : null,
                     'stock' => self::POD_STOCK,
@@ -78,11 +82,76 @@ class PrintifyProductImporter
         return $product;
     }
 
-    protected function parseTitle(string $title): array
+    /**
+     * Map Printify option value ids to their type, title and swatch colour.
+     *
+     * @return array<int, array{type:string, title:string, hex:?string}>
+     */
+    protected function optionLookup(array $options): array
     {
-        $parts = array_map('trim', explode('/', $title));
+        $lookup = [];
 
-        return [$parts[0] ?? null, $parts[1] ?? null];
+        foreach ($options as $option) {
+            foreach ($option['values'] ?? [] as $value) {
+                $lookup[$value['id']] = [
+                    'type' => $option['type'] ?? '',
+                    'title' => $value['title'] ?? '',
+                    'hex' => $value['colors'][0] ?? null,
+                ];
+            }
+        }
+
+        return $lookup;
+    }
+
+    /**
+     * Work out a variant's size and colour from its option ids.
+     * Falls back to the "Color / Size" title when options are missing.
+     */
+    protected function variantOptions(array $variant, array $lookup): array
+    {
+        $result = ['size' => null, 'color' => null, 'color_hex' => null];
+        $other = [];
+
+        foreach ($variant['options'] ?? [] as $id) {
+            $value = $lookup[$id] ?? null;
+
+            if (! $value) {
+                continue;
+            }
+
+            if ($value['type'] === 'color') {
+                $result['color'] = $value['title'];
+                $result['color_hex'] = $value['hex'];
+            } elseif ($value['type'] === 'size') {
+                $result['size'] = $value['title'];
+            } else {
+                $other[] = $value['title'];
+            }
+        }
+
+        // Non-apparel options (e.g. "11oz", "Glossy") are shown as the size choice.
+        if (! $result['size'] && $other) {
+            $result['size'] = implode(' / ', $other);
+        }
+
+        if (! $result['size'] && ! $result['color']) {
+            $parts = array_map('trim', explode('/', $variant['title'] ?? ''));
+            $result['color'] = count($parts) > 1 ? $parts[0] : null;
+            $result['size'] = end($parts) ?: null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * The best image for a variant: its default mockup, else its first one.
+     */
+    protected function variantImage(array $images, int $variantId): ?string
+    {
+        $forVariant = collect($images)->filter(fn ($img) => in_array($variantId, $img['variant_ids'] ?? []));
+
+        return ($forVariant->firstWhere('is_default', true) ?? $forVariant->first())['src'] ?? null;
     }
 
     protected function uniqueSlug(string $title, string $printifyId): string

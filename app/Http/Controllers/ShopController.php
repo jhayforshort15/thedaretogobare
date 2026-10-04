@@ -62,7 +62,16 @@ class ShopController extends Controller
                 'stock' => $product->stock,
                 'category' => $product->category?->only(['name', 'slug']),
                 'brand' => $product->brand?->only(['name', 'slug']),
-                'sizes' => $product->variants->pluck('size')->filter()->unique()->values(),
+                'sizes' => $this->sortSizes($product->variants->pluck('size')->filter()->unique()->values()->all()),
+                'colors' => $product->variants->whereNotNull('color')->unique('color')
+                    ->map(fn ($v) => ['name' => $v->color, 'hex' => $v->color_hex])->values(),
+                'variants' => $product->variants->map(fn ($v) => [
+                    'size' => $v->size,
+                    'color' => $v->color,
+                    'price' => $v->priceFor($product),
+                    'image' => $v->image,
+                    'in_stock' => $v->stock > 0,
+                ])->values(),
                 'images' => $product->images->map(fn ($img) => ['path' => $img->path, 'alt' => $img->alt]),
             ],
             'related' => Product::where('is_active', true)
@@ -79,5 +88,22 @@ class ShopController extends Controller
                     'image' => $p->image_url,
                 ]),
         ]);
+    }
+
+    /**
+     * Order apparel sizes naturally (XS, S, M, L, XL, 2XL…); others keep their order after.
+     */
+    protected function sortSizes(array $sizes): array
+    {
+        $order = ['XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', 'XXL', '3XL', 'XXXL', '4XL', '5XL', '6XL'];
+
+        usort($sizes, function ($a, $b) use ($order) {
+            $ia = array_search(strtoupper($a), $order);
+            $ib = array_search(strtoupper($b), $order);
+
+            return ($ia === false ? PHP_INT_MAX : $ia) <=> ($ib === false ? PHP_INT_MAX : $ib);
+        });
+
+        return $sizes;
     }
 }

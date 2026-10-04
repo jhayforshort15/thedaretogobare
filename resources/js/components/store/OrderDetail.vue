@@ -1,5 +1,5 @@
 <script setup lang="ts">
-interface OrderItem { name: string; size: string | null; price: number; quantity: number; subtotal: number }
+interface OrderItem { name: string; size: string | null; color: string | null; price: number; quantity: number; subtotal: number }
 interface Order {
     order_number: string;
     placed_at: string | null;
@@ -67,7 +67,7 @@ const statusClass = (status: string) => {
                 <div>
                     <p class="text-sm font-semibold">{{ item.name }}</p>
                     <p class="text-xs text-neutral-500">
-                        <span v-if="item.size">Size {{ item.size }} · </span>Qty {{ item.quantity }} × {{ money(item.price) }}
+                        <span v-if="item.size">Size {{ item.size }} · </span><span v-if="item.color">{{ item.color }} · </span>Qty {{ item.quantity }} × {{ money(item.price) }}
                     </p>
                 </div>
                 <span class="text-sm font-semibold">{{ money(item.subtotal) }}</span>

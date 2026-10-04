@@ -20,7 +20,7 @@ class ItemsRelationManager extends RelationManager
                 TextColumn::make('name')
                     ->label('Product')
                     ->weight('bold')
-                    ->description(fn ($record) => $record->size ? "Size: {$record->size}" : null),
+                    ->description(fn ($record) => $record->optionsLabel()),
                 TextColumn::make('price')
                     ->money('usd'),
                 TextColumn::make('quantity')
