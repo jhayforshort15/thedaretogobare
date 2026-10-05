@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Orders\Pages;
 
 use App\Filament\Resources\Orders\OrderResource;
+use App\Filament\Widgets\SalesStatsOverview;
 use Filament\Resources\Pages\ListRecords;
 
 class ListOrders extends ListRecords
@@ -12,5 +13,10 @@ class ListOrders extends ListRecords
     protected function getHeaderActions(): array
     {
         return [];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [SalesStatsOverview::class];
     }
 }

@@ -98,8 +98,8 @@ class OrdersTable
             ->recordActions([
                 PrintifyActions::retry()->iconButton(),
                 PrintifyActions::sendToProduction()->iconButton(),
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->iconButton(),
+                EditAction::make()->iconButton(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
